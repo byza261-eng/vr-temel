@@ -3,11 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iOS VR Güvenli Başlatma</title>
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
+  <title>iOS WebGL Test</title>
   <style>
-    body { margin: 0; background: black; }
+    body { margin:0; background:black; overflow:hidden; }
     button {
       position: fixed;
       top: 45%;
@@ -19,42 +17,31 @@
       border: none;
       border-radius: 12px;
       font-weight: bold;
-      z-index: 999;
+      z-index: 10;
     }
+    canvas { display:block; }
   </style>
 </head>
-
 <body>
 
-<button id="btn">SAHNEYİ BAŞLAT</button>
+<button id="btn">TESTİ BAŞLAT</button>
 
 <script>
-document.getElementById("btn").addEventListener("click", async () => {
+const btn = document.getElementById("btn");
+
+btn.onclick = async () => {
 
   // iOS sensör izni
   if (typeof DeviceOrientationEvent !== "undefined" &&
       typeof DeviceOrientationEvent.requestPermission === "function") {
     const p = await DeviceOrientationEvent.requestPermission();
     if (p !== "granted") {
-      alert("Sensör izni gerekli");
+      alert("Sensör izni verilmedi");
       return;
     }
   }
 
-  // SAHNEYİ SONRADAN OLUŞTUR
-  document.body.innerHTML = `
-    <a-scene>
-      <a-sky color="#87CEEB"></a-sky>
+  btn.remove();
 
-      <a-plane rotation="-90 0 0" width="50" height="50" color="#7BC8A4"></a-plane>
-
-      <a-box position="0 1.5 -3" rotation="0 45 0" color="#FF5722"></a-box>
-
-      <a-camera position="0 1.6 0" look-controls></a-camera>
-    </a-scene>
-  `;
-});
-</script>
-
-</body>
-</html>
+  // WebGL canvas
+  const canvas = document.createElement("canv
