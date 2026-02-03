@@ -8,12 +8,12 @@
     :root{
       --bg1:#1a2a3a; --bg2:#2d4a5c;
       --card:rgba(255,255,255,.06);
-      --card2:rgba(255,255,255,.04);
       --stroke:rgba(255,255,255,.10);
       --green:#4CAF50;
       --amber:#FFC107;
       --blue:#2196F3;
       --red:#D32F2F;
+      --purple:#6A1B9A;
     }
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{width:100%;height:100%}
@@ -21,15 +21,14 @@
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       background: linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 100%);
       color:#fff;
-      overflow:auto; /* normal mod: scroll açık */
+      overflow:auto;
       -webkit-tap-highlight-color: transparent;
+      touch-action: pan-y;
     }
-    /* BEP Mode */
     body.bep-mode{ font-size: 18px; }
     body.bep-mode .section-title{ font-size: 26px; }
     body.bep-mode button{ font-size: 18px; }
 
-    /* Header */
     .header{
       position: sticky;
       top: 0;
@@ -83,10 +82,9 @@
     }
     .pill.bep{ background: var(--blue); }
     .pill.bep.active{ background: #FF9800; }
-    .pill.vr{ background: #6A1B9A; }
+    .pill.vr{ background: var(--purple); }
     .pill.vr.active{ background: var(--red); }
 
-    /* Layout */
     .container{
       max-width: 1200px;
       margin: 0 auto;
@@ -119,7 +117,6 @@
       .grid{ grid-template-columns: 1fr; }
     }
 
-    /* Simulator */
     .task{
       background: rgba(255,193,7,.16);
       border: 2px solid var(--amber);
@@ -147,28 +144,12 @@
       background: #10161c;
       border: 1px solid rgba(255,255,255,.08);
     }
+    #terrainWrap{ position:absolute; inset:0; overflow:hidden; }
+    canvas.terrain{ position:absolute; inset:0; width:100%; height:100%; }
 
-    /* 3D Terrain canvas sits behind */
-    #terrainWrap{
-      position:absolute; inset:0;
-      overflow:hidden;
-    }
-    canvas.terrain{
-      position:absolute; inset:0;
-      width:100%; height:100%;
-      image-rendering: auto;
-    }
+    .layer{ position:absolute; inset:0; pointer-events:none; opacity:1; transition: opacity .18s; }
+    .layer.hidden{ opacity:0; }
 
-    /* Overlays (layers) */
-    .layer{
-      position:absolute; inset:0;
-      pointer-events:none;
-      opacity: 1;
-      transition: opacity .18s;
-    }
-    .layer.hidden{ opacity: 0; }
-
-    /* Roads overlay (simple vector-ish) */
     .roads-layer{
       background:
         repeating-linear-gradient(90deg, transparent, transparent 70px, rgba(255,215,0,.55) 70px, rgba(255,215,0,.55) 73px),
@@ -200,7 +181,6 @@
       opacity: .90;
     }
 
-    /* Info points */
     .info{
       position:absolute;
       background: rgba(76,175,80,.92);
@@ -218,13 +198,7 @@
     .pulse{ animation:pulse 1.8s infinite; }
     @keyframes pulse{ 0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)} }
 
-    /* Controls */
-    .controls{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top: 10px;
-    }
+    .controls{ display:flex; flex-wrap:wrap; gap:8px; margin-top: 10px; }
     .btn{
       border:0;
       border-radius: 12px;
@@ -266,7 +240,6 @@
       touch-action: manipulation;
     }
 
-    /* Right panel lists */
     .missions{ display:grid; grid-template-columns: 1fr; gap:10px; }
     .mission{
       position:relative;
@@ -298,15 +271,11 @@
       padding: 10px;
       text-align:center;
     }
-    .ach.unlocked{
-      border-color: var(--amber);
-      background: rgba(255,193,7,.10);
-    }
+    .ach.unlocked{ border-color: var(--amber); background: rgba(255,193,7,.10); }
     .achIcon{ font-size: 32px; margin-bottom: 6px; }
     .achName{ font-size: 12px; font-weight: 900; }
     .achDesc{ font-size: 10px; color:#B0BEC5; line-height:1.3; }
 
-    /* Quiz */
     .quizQ{
       border-radius: 14px;
       background: rgba(255,255,255,.06);
@@ -356,8 +325,8 @@
     .result .score{ font-size: 26px; font-weight: 900; color: var(--amber); }
     .result .msg{ margin-top: 6px; color:#E0E0E0; }
 
-    /* ======================= VR OVERLAY ======================= */
-    body.vr-on{ overflow:hidden; }
+    /* VR */
+    body.vr-on{ overflow:hidden; touch-action:none; }
     #vrOverlay{
       position:fixed; inset:0;
       background:#000;
@@ -366,7 +335,6 @@
     }
     body.vr-on #vrOverlay{ display:block; }
 
-    /* Orientation wrapper: portrait -> rotate to landscape */
     #vrRoot{ position:absolute; inset:0; }
     #vrRoot.landscape .vrStage{ position:absolute; inset:0; transform:none; transform-origin:center center; }
     #vrRoot.portrait .vrStage{
@@ -379,7 +347,6 @@
       transform-origin: center center;
     }
 
-    /* VR HUD */
     .vrHud{
       position:absolute;
       left:0; right:0; top:0;
@@ -406,6 +373,7 @@
       backdrop-filter: blur(8px);
     }
     .vrHud .danger{ background: rgba(211,47,47,.92); }
+    .vrHud .ok{ background: rgba(76,175,80,.85); }
     .vrHud .miniStat{
       border-radius: 12px;
       padding: 10px 12px;
@@ -417,12 +385,7 @@
       text-align:center;
     }
 
-    /* VR Eyes */
-    .eyes{
-      position:absolute; inset:0;
-      display:flex;
-      z-index: 2;
-    }
+    .eyes{ position:absolute; inset:0; display:flex; z-index: 2; }
     .eye{
       width:50%;
       height:100%;
@@ -438,10 +401,7 @@
       width: 100%;
       height: 100%;
     }
-    canvas.vrTerrain{
-      position:absolute; inset:0;
-      width:100%; height:100%;
-    }
+    canvas.vrTerrain{ position:absolute; inset:0; width:100%; height:100%; }
     .vrLayer{ position:absolute; inset:0; pointer-events:none; transition: opacity .18s; }
     .vrLayer.hidden{ opacity:0; }
 
@@ -469,7 +429,6 @@
 </head>
 
 <body>
-  <!-- HEADER -->
   <div class="header">
     <div class="logo">🗺️ HaritaGöz</div>
     <div class="stats">
@@ -482,16 +441,17 @@
   </div>
 
   <div class="container">
-    <!-- MAIN GRID -->
     <div class="section">
       <div class="section-title">🎯 AR Harita Simülatörü</div>
 
       <div class="grid">
-        <!-- LEFT: Simulator -->
         <div>
           <div class="task" id="taskBox">
             <div class="t1" id="taskTitle">Hoş Geldiniz!</div>
-            <div class="t2" id="taskDesc">Katmanları aç/kapat. Yön tuşlarıyla bakış açısını değiştir. Bilgi noktalarına dokun. (VR’de de aynısı.)</div>
+            <div class="t2" id="taskDesc">
+              Katmanları aç/kapat. Yön tuşlarıyla bakış açısını değiştir. Bilgi noktalarına dokun.
+              VR’de “Baş İzleme Aç” ile kafanı çevirdikçe görüntü döner. 🎮 Kumanda da desteklenir.
+            </div>
           </div>
 
           <div class="sim">
@@ -500,13 +460,11 @@
                 <canvas class="terrain" id="terrainCanvas"></canvas>
               </div>
 
-              <!-- 2D Layers over the 3D-ish terrain -->
               <div class="layer roads-layer hidden" id="layer-roads"></div>
               <div class="layer water-layer hidden" id="layer-water"></div>
               <div class="layer settlement-layer hidden" id="layer-settlement"></div>
               <div class="layer risk-layer hidden" id="layer-risk"></div>
 
-              <!-- Info points -->
               <div class="info pulse" style="top:26%; left:26%" data-info="topography">📊 Topografya</div>
               <div class="info pulse" style="top:70%; left:58%" data-info="risk">⚠️ Risk</div>
               <div class="info pulse" style="top:40%; left:70%" data-info="water">💧 Su</div>
@@ -535,10 +493,12 @@
               Normal modda sayfa aşağı kayar ✅<br>
               VR modda iki göz tam ekrana oturur ✅ (telefon dikse otomatik döner)
             </div>
+            <div id="padStatus" style="margin-top:8px;color:#B0BEC5;font-size:12px">
+              🎮 Kumanda: Bağlı değil (Bluetooth ile bağla; bazı kumandalar “klavye” gibi davranır)
+            </div>
           </div>
         </div>
 
-        <!-- RIGHT: Missions + Achievements -->
         <div>
           <div class="section" style="margin-bottom:14px;">
             <div class="section-title">🎯 Görevler</div>
@@ -553,7 +513,6 @@
       </div>
     </div>
 
-    <!-- QUIZ -->
     <div class="section" id="quiz-section">
       <div class="section-title">📝 Harita Okuryazarlığı Testi</div>
       <div id="quiz"></div>
@@ -565,12 +524,14 @@
     </div>
   </div>
 
-  <!-- ================= VR OVERLAY ================= -->
+  <!-- VR OVERLAY -->
   <div id="vrOverlay" aria-hidden="true">
     <div id="vrRoot" class="landscape">
       <div class="vrStage">
         <div class="vrHud">
           <button id="vrClose" class="danger" type="button">✕ Kapat</button>
+
+          <button id="vrHeadBtn" class="ok" type="button">🧠 Baş İzleme Aç</button>
 
           <button id="vrTopo" type="button">🏔️</button>
           <button id="vrRoads" type="button">🛣️</button>
@@ -615,9 +576,7 @@
   </div>
 
   <script>
-    /**********************
-     * iOS tıklama sağlamlaştırma
-     **********************/
+    /* ===== iOS tıklama sağlamlaştırma ===== */
     function bindTap(el, fn){
       if(!el) return;
       const fire = (e)=>{ try{ e.preventDefault?.(); }catch(_){} fn(e); };
@@ -626,9 +585,7 @@
       el.addEventListener('click', (e)=>{ e.preventDefault(); fn(e); }, false);
     }
 
-    /**********************
-     * Game State
-     **********************/
+    /* ===== Game State ===== */
     const gameState = {
       score: 0,
       level: 1,
@@ -642,7 +599,12 @@
       roadsExplored: false,
       quizCompleted: false,
       bepMode: false,
-      vrOn: false
+      vrOn: false,
+
+      // Head tracking
+      headTracking: false,
+      headYawRad: 0,        // current yaw
+      headYawZeroRad: null  // calibration baseline
     };
 
     const dirs = ['n','ne','e','se','s','sw','w','nw'];
@@ -693,22 +655,20 @@
       { q:'Yaya için güvenli güzergah planlarken hangi katmanlar önemlidir?', opts:['Ulaşım + risk','Sadece topografya','Sadece su','Sadece yerleşim'], c:0 },
       { q:'AR harita uygulamalarının avantajı nedir?', opts:['Daha pahalıdır','Gerçek çevre ile harita birleşir','Sadece sınıfta kullanılır','Tek katman gösterir'], c:1 }
     ];
+    const selected = {};
 
-    const selected = {}; // quiz selections
-
-    /**********************
-     * UI Render
-     **********************/
+    /* ===== UI ===== */
     function updateStats(){
       document.getElementById('score').textContent = gameState.score;
       document.getElementById('level').textContent = gameState.level;
       document.getElementById('missions-completed').textContent = `${gameState.completedMissions}/${missions.length}`;
 
-      // VR mini
       document.getElementById('vrMiniScore').textContent = gameState.score;
       document.getElementById('vrMiniLevel').textContent = `Lv${gameState.level}`;
-      document.getElementById('vrHintL').textContent = `🧭 ${dirLabel[gameState.currentDirection]}`;
-      document.getElementById('vrHintR').textContent = `🧭 ${dirLabel[gameState.currentDirection]}`;
+
+      const d = dirLabel[gameState.currentDirection];
+      document.getElementById('vrHintL').textContent = `🧭 ${d}`;
+      document.getElementById('vrHintR').textContent = `🧭 ${d}`;
     }
 
     function renderMissions(){
@@ -747,12 +707,9 @@
       }).join('');
     }
 
-    /**********************
-     * Score / level / achievements
-     **********************/
+    /* ===== Score/Achievement ===== */
     function addScore(points){
       gameState.score += points;
-
       if(gameState.score >= 500) unlockAchievement(6);
 
       const newLevel = Math.floor(gameState.score / 200) + 1;
@@ -769,9 +726,7 @@
       addScore(50);
     }
 
-    /**********************
-     * Mission progression
-     **********************/
+    /* ===== Missions ===== */
     function completeMission(idx){
       const m = missions[idx];
       if(m.status==='completed') return;
@@ -794,47 +749,32 @@
           m.status = 'active';
         }
       });
-
       renderMissions();
       updateStats();
     }
 
-    /**********************
-     * Layers
-     **********************/
+    /* ===== Layers ===== */
     function setLayerVisibility(layerName, visible){
-      // normal overlays
       const map = {
         roads: document.getElementById('layer-roads'),
         water: document.getElementById('layer-water'),
         settlement: document.getElementById('layer-settlement'),
         risk: document.getElementById('layer-risk')
       };
-
-      // VR overlays
       const vmap = {
         roads: [document.getElementById('vr-roads-L'), document.getElementById('vr-roads-R')],
         water: [document.getElementById('vr-water-L'), document.getElementById('vr-water-R')],
         settlement: [document.getElementById('vr-settlement-L'), document.getElementById('vr-settlement-R')],
         risk: [document.getElementById('vr-risk-L'), document.getElementById('vr-risk-R')]
       };
-
-      if(map[layerName]){
-        map[layerName].classList.toggle('hidden', !visible);
-      }
-      if(vmap[layerName]){
-        vmap[layerName].forEach(el=> el.classList.toggle('hidden', !visible));
-      }
+      if(map[layerName]) map[layerName].classList.toggle('hidden', !visible);
+      if(vmap[layerName]) vmap[layerName].forEach(el=> el.classList.toggle('hidden', !visible));
     }
 
     function updateLayerButtons(){
       document.querySelectorAll('.btn[data-layer]').forEach(btn=>{
         const name = btn.dataset.layer;
-        if(name === 'topography'){
-          // topography button always "active" visually
-          btn.classList.remove('inactive');
-          return;
-        }
+        if(name === 'topography'){ btn.classList.remove('inactive'); return; }
         const isOn = gameState.activeLayers.has(name);
         btn.classList.toggle('inactive', !isOn);
       });
@@ -842,16 +782,12 @@
 
     function toggleLayer(layerName){
       if(layerName === 'topography'){
-        // Topography: bizim 3D terrain zaten temel. "Kapansın mı?" dersen kapatırız.
-        // Şimdilik: topografya ana katman, aktif tutulur.
         gameState.activeLayers.add('topography');
         unlockAchievement(1);
         checkMissions();
-        // terrain render update
-        requestRender();
+        requestRender(true);
         return;
       }
-
       const isOn = gameState.activeLayers.has(layerName);
       if(isOn){
         gameState.activeLayers.delete(layerName);
@@ -861,62 +797,46 @@
         setLayerVisibility(layerName, true);
         gameState.layersUsed.add(layerName);
       }
-
       if(layerName === 'roads') gameState.roadsExplored = true;
 
       unlockAchievement(1);
       updateLayerButtons();
       checkMissions();
-      requestRender();
+      requestRender(true);
     }
 
-    /**********************
-     * Directions / camera
-     **********************/
+    /* ===== Directions ===== */
     function changeDirection(dir){
       gameState.currentDirection = dir;
       gameState.directionsExplored.add(dir);
       if(gameState.directionsExplored.size >= 4) unlockAchievement(2);
       checkMissions();
-      requestRender();
+      requestRender(true);
     }
-
     function rotateDirection(step){
       const i = dirs.indexOf(gameState.currentDirection);
       const ni = (i + step + dirs.length) % dirs.length;
       changeDirection(dirs[ni]);
     }
 
-    /**********************
-     * Info points
-     **********************/
+    /* ===== Info Points ===== */
     function clickInfoPoint(type){
-      if(type === 'risk'){
-        gameState.riskPointClicked = true;
-        unlockAchievement(3);
-      }
-      if(type === 'water'){
-        gameState.waterPointClicked = true;
-        unlockAchievement(4);
-      }
+      if(type === 'risk'){ gameState.riskPointClicked = true; unlockAchievement(3); }
+      if(type === 'water'){ gameState.waterPointClicked = true; unlockAchievement(4); }
       addScore(25);
       checkMissions();
 
-      // kısa flash effect
       const vp = document.getElementById('viewport');
       vp.style.filter = 'brightness(1.15)';
       setTimeout(()=>vp.style.filter='brightness(1)', 150);
     }
 
-    /**********************
-     * Quiz
-     **********************/
+    /* ===== Quiz ===== */
     function selectQuizOption(q,o,el){
       document.querySelectorAll(`.opt[data-q="${q}"]`).forEach(x=>x.classList.remove('selected'));
       el.classList.add('selected');
       selected[q] = o;
     }
-
     function checkQuiz(){
       let correct = 0;
       quizQuestions.forEach((qq,i)=>{
@@ -949,15 +869,12 @@
         addScore(100);
       }
       document.getElementById('resultMsg').textContent = msg;
-
       document.getElementById('checkBtn').disabled = true;
       gameState.quizCompleted = true;
       checkMissions();
     }
 
-    /**********************
-     * BEP
-     **********************/
+    /* ===== BEP ===== */
     function toggleBEP(){
       gameState.bepMode = !gameState.bepMode;
       document.body.classList.toggle('bep-mode', gameState.bepMode);
@@ -965,14 +882,10 @@
       const btn = document.getElementById('bepBtn');
       btn.classList.toggle('active', gameState.bepMode);
       btn.textContent = gameState.bepMode ? 'Normal Mod' : 'BEP Modu';
-
-      // VR HUD BEP butonu da güncel kalsın
       document.getElementById('vrBep').textContent = gameState.bepMode ? 'Normal' : 'BEP';
     }
 
-    /**********************
-     * VR mode
-     **********************/
+    /* ===== VR ===== */
     function setVRRootClass(){
       const isPortrait = window.innerHeight > window.innerWidth;
       const vrRoot = document.getElementById('vrRoot');
@@ -993,11 +906,15 @@
       setVRRootClass();
       resizeAllCanvases();
       requestRender(true);
+      updateHeadBtn();
     }
 
     function closeVR(){
       if(!gameState.vrOn) return;
       gameState.vrOn = false;
+
+      // baş izleme açıkken kapat
+      stopHeadTracking();
 
       document.body.classList.remove('vr-on');
       document.getElementById('vrOverlay').setAttribute('aria-hidden','true');
@@ -1005,6 +922,7 @@
       const vrBtn = document.getElementById('vrBtn');
       vrBtn.classList.remove('active');
       vrBtn.textContent = 'VR Modu';
+      updateHeadBtn();
     }
 
     function toggleVR(){
@@ -1012,44 +930,123 @@
       else openVR();
     }
 
-    /**********************
-     * 3D-ish Terrain Renderer (single file, no libs)
-     * - Procedural heightmap
-     * - Simple perspective projection
-     * - Shading based on slope + light direction
-     * - Camera yaw depends on direction
-     * - VR: two eyes with small stereo offset
-     **********************/
+    /* ===== Head Tracking (DeviceOrientation) =====
+       - iOS requires user gesture permission
+       - We use yaw (alpha/compass) as camera yaw offset
+    */
+    function updateHeadBtn(){
+      const b = document.getElementById('vrHeadBtn');
+      if(!b) return;
+      if(!gameState.vrOn){
+        b.textContent = '🧠 Baş İzleme Aç';
+        b.classList.add('ok');
+        return;
+      }
+      b.textContent = gameState.headTracking ? '🧠 Baş İzleme Kapat' : '🧠 Baş İzleme Aç';
+      b.classList.toggle('ok', !gameState.headTracking);
+    }
+
+    function normalizeRad(a){
+      while(a > Math.PI) a -= Math.PI*2;
+      while(a < -Math.PI) a += Math.PI*2;
+      return a;
+    }
+
+    function onDeviceOrientation(e){
+      // iOS Safari sometimes provides webkitCompassHeading (0..360, 0=N)
+      // Else use alpha (0..360, 0 at device reference)
+      let headingDeg = null;
+
+      if(typeof e.webkitCompassHeading === 'number'){
+        headingDeg = e.webkitCompassHeading;
+      } else if(typeof e.alpha === 'number'){
+        // alpha: 0..360 (clockwise)
+        headingDeg = e.alpha;
+      }
+
+      if(headingDeg === null) return;
+
+      const yaw = (headingDeg * Math.PI/180);
+      if(gameState.headYawZeroRad === null){
+        // calibrate baseline on first reading
+        gameState.headYawZeroRad = yaw;
+      }
+      const rel = normalizeRad(yaw - gameState.headYawZeroRad);
+      gameState.headYawRad = rel;
+
+      if(gameState.vrOn) requestRender(false);
+    }
+
+    async function startHeadTracking(){
+      if(gameState.headTracking) return;
+      // iOS permission
+      const DO = window.DeviceOrientationEvent;
+      if(!DO){
+        alert('Bu cihazda DeviceOrientation desteklenmiyor.');
+        return;
+      }
+
+      if(typeof DO.requestPermission === 'function'){
+        try{
+          const res = await DO.requestPermission();
+          if(res !== 'granted'){
+            alert('Baş izleme izni verilmedi.');
+            return;
+          }
+        }catch(err){
+          alert('Baş izleme izni alınamadı.');
+          return;
+        }
+      }
+
+      gameState.headYawZeroRad = null;
+      gameState.headYawRad = 0;
+      window.addEventListener('deviceorientation', onDeviceOrientation, true);
+      gameState.headTracking = true;
+      updateHeadBtn();
+      requestRender(true);
+    }
+
+    function stopHeadTracking(){
+      if(!gameState.headTracking) return;
+      window.removeEventListener('deviceorientation', onDeviceOrientation, true);
+      gameState.headTracking = false;
+      gameState.headYawZeroRad = null;
+      gameState.headYawRad = 0;
+      updateHeadBtn();
+      requestRender(true);
+    }
+
+    function toggleHeadTracking(){
+      if(!gameState.vrOn) return;
+      if(gameState.headTracking) stopHeadTracking();
+      else startHeadTracking();
+    }
+
+    /* ===== 3D-ish Terrain Renderer ===== */
     const terrain = {
       size: 64,
       heights: null,
       seed: 1337,
       needsRender: true,
-      raf: 0,
-      lastW: 0,
-      lastH: 0
+      raf: 0
     };
 
     function rand2d(x,y){
-      // deterministic hash -> [0,1)
       const s = Math.sin(x*127.1 + y*311.7 + terrain.seed) * 43758.5453123;
       return s - Math.floor(s);
     }
     function smoothstep(t){ return t*t*(3-2*t); }
-
     function noise(x,y){
       const x0 = Math.floor(x), y0 = Math.floor(y);
       const xf = x - x0, yf = y - y0;
-      const r00 = rand2d(x0,y0);
-      const r10 = rand2d(x0+1,y0);
-      const r01 = rand2d(x0,y0+1);
-      const r11 = rand2d(x0+1,y0+1);
+      const r00 = rand2d(x0,y0), r10 = rand2d(x0+1,y0);
+      const r01 = rand2d(x0,y0+1), r11 = rand2d(x0+1,y0+1);
       const u = smoothstep(xf), v = smoothstep(yf);
       const a = r00*(1-u) + r10*u;
       const b = r01*(1-u) + r11*u;
       return a*(1-v) + b*v;
     }
-
     function fbm(x,y){
       let n=0, amp=0.55, f=1.0;
       for(let i=0;i<5;i++){
@@ -1059,15 +1056,12 @@
       }
       return n;
     }
-
     function generateHeightmap(){
       const N = terrain.size;
       const h = new Float32Array(N*N);
       for(let y=0;y<N;y++){
         for(let x=0;x<N;x++){
-          const nx = x/(N-1);
-          const ny = y/(N-1);
-          // island-like falloff
+          const nx = x/(N-1), ny = y/(N-1);
           const dx = nx-0.5, dy=ny-0.5;
           const d = Math.sqrt(dx*dx+dy*dy);
           const fall = Math.max(0, 1 - d*1.7);
@@ -1076,7 +1070,6 @@
           e = e*1.15 - 0.1;
           e *= fall;
 
-          // carve a "valley/river"
           const river = Math.abs((nx*1.2 + ny*0.8) - 0.9);
           e -= Math.max(0, 0.20 - river)*1.3;
 
@@ -1092,7 +1085,6 @@
     }
 
     function projectPoint(x,y,z, cam){
-      // rotate around center
       const cx = x - cam.center;
       const cy = y - cam.center;
 
@@ -1100,13 +1092,11 @@
       const rx = cx*cosY - cy*sinY;
       const ry = cx*sinY + cy*cosY;
 
-      // camera tilt
       const cosP = Math.cos(cam.pitch), sinP = Math.sin(cam.pitch);
       const rz = z;
       const ty = ry*cosP - rz*sinP;
       const tz = ry*sinP + rz*cosP;
 
-      // perspective
       const px = rx;
       const py = ty;
       const pz = tz + cam.dist;
@@ -1117,26 +1107,19 @@
     }
 
     function shadeColor(z, dzdx, dzdy){
-      // light direction
       const lx=0.6, ly=0.4, lz=0.7;
-      // normal approx
       let nx = -dzdx, ny = -dzdy, nz = 1.0;
       const inv = 1 / Math.sqrt(nx*nx+ny*ny+nz*nz);
       nx*=inv; ny*=inv; nz*=inv;
       const diff = Math.max(0.0, nx*lx + ny*ly + nz*lz);
-
-      // base terrain palette
-      // low: blue-ish water/valley, mid: green, high: brown/rock
       let r,g,b;
-      if(z < 0.05){ r=35; g=95; b=140; }          // water-ish
-      else if(z < 0.22){ r=46; g=145; b=85; }     // green
-      else if(z < 0.45){ r=76; g=170; b=90; }     // brighter green
-      else if(z < 0.70){ r=130; g=110; b=70; }    // brown
-      else { r=170; g=160; b=140; }               // rock/snow-ish
-
+      if(z < 0.05){ r=35; g=95; b=140; }
+      else if(z < 0.22){ r=46; g=145; b=85; }
+      else if(z < 0.45){ r=76; g=170; b=90; }
+      else if(z < 0.70){ r=130; g=110; b=70; }
+      else { r=170; g=160; b=140; }
       const amb = 0.35;
       const lit = amb + diff*0.75;
-
       r = Math.min(255, Math.floor(r*lit));
       g = Math.min(255, Math.floor(g*lit));
       b = Math.min(255, Math.floor(b*lit));
@@ -1151,18 +1134,20 @@
       ctx.fillStyle = '#0b0f14';
       ctx.fillRect(0,0,w,h);
 
-      const yaw = getYawForDirection(gameState.currentDirection);
+      // Base yaw from direction + optional head tracking offset (VR only)
+      const baseYaw = getYawForDirection(gameState.currentDirection);
+      const headYaw = (gameState.vrOn && gameState.headTracking) ? gameState.headYawRad : 0;
+      const yaw = baseYaw + headYaw;
+
       const cam = {
         w,h,
-        yaw: yaw + eyeOffset,          // stereo: small yaw offset
-        pitch: 0.85,                   // tilt down
-        dist: 2.2,                     // camera distance
+        yaw: yaw + eyeOffset,
+        pitch: 0.85,
+        dist: 2.2,
         fov: Math.min(w,h)*1.10,
         center: (N-1)/2
       };
 
-      // draw back-to-front by rotated y
-      // compute order: for each row, use rotated coordinate
       const order = [];
       for(let y=0;y<N-1;y++){
         for(let x=0;x<N-1;x++){
@@ -1175,10 +1160,10 @@
         const bx=b[0]-cam.center, by=b[1]-cam.center;
         const ary = ax*sinY + ay*cosY;
         const bry = bx*sinY + by*cosY;
-        return ary - bry; // far first
+        return ary - bry;
       });
 
-      const scaleZ = 2.2; // exaggeration for 3D feel
+      const scaleZ = 2.2;
 
       for(const [x,y] of order){
         const i00 = y*N + x;
@@ -1196,11 +1181,9 @@
         const p01 = projectPoint(x,y+1,z01,cam);
         const p11 = projectPoint(x+1,y+1,z11,cam);
 
-        // approximate slope for shading
         const dzdx = (z10 - z00 + z11 - z01) * 0.5;
         const dzdy = (z01 - z00 + z11 - z10) * 0.5;
 
-        // draw two triangles
         ctx.beginPath();
         ctx.moveTo(p00[0],p00[1]);
         ctx.lineTo(p10[0],p10[1]);
@@ -1218,7 +1201,6 @@
         ctx.fill();
       }
 
-      // subtle vignette
       const grd = ctx.createRadialGradient(w/2,h/2, Math.min(w,h)*0.15, w/2,h/2, Math.min(w,h)*0.75);
       grd.addColorStop(0,'rgba(0,0,0,0)');
       grd.addColorStop(1,'rgba(0,0,0,0.45)');
@@ -1258,34 +1240,21 @@
 
     function renderFrame(){
       terrain.raf = 0;
-
-      // resize if needed
       resizeAllCanvases();
-
       if(!terrain.needsRender) return;
       terrain.needsRender = false;
 
-      // normal canvas
       const c = document.getElementById('terrainCanvas');
-      const ctx = c.getContext('2d');
-      drawTerrain(ctx, c.width, c.height, 0);
+      drawTerrain(c.getContext('2d'), c.width, c.height, 0);
 
-      // VR canvases (if on)
       if(gameState.vrOn){
         const vL = document.getElementById('vrCanvasL');
         const vR = document.getElementById('vrCanvasR');
-        const cl = vL.getContext('2d');
-        const cr = vR.getContext('2d');
-
-        // small stereo offsets
-        drawTerrain(cl, vL.width, vL.height, -0.025);
-        drawTerrain(cr, vR.width, vR.height, +0.025);
+        drawTerrain(vL.getContext('2d'), vL.width, vL.height, -0.025);
+        drawTerrain(vR.getContext('2d'), vR.width, vR.height, +0.025);
       }
     }
 
-    /**********************
-     * Apply layer visibility on init / changes
-     **********************/
     function syncLayersToUI(){
       setLayerVisibility('roads', gameState.activeLayers.has('roads'));
       setLayerVisibility('water', gameState.activeLayers.has('water'));
@@ -1293,29 +1262,126 @@
       setLayerVisibility('risk', gameState.activeLayers.has('risk'));
       updateLayerButtons();
       updateStats();
-      requestRender();
+      requestRender(true);
     }
 
-    /**********************
-     * Events Wiring
-     **********************/
+    /* ===== Kumanda (Gamepad + Keyboard fallback) ===== */
+    function setPadStatus(text){
+      const el = document.getElementById('padStatus');
+      if(el) el.textContent = text;
+    }
+    const pad = { index:null, lastButtons:[], lastAxes:[0,0,0,0], lastActionAt:0 };
+    function nowMs(){ return performance.now(); }
+    function throttle(ms=180){
+      const t = nowMs();
+      if(t - pad.lastActionAt < ms) return false;
+      pad.lastActionAt = t;
+      return true;
+    }
+    function nextLayerToggle(){
+      const order = ['roads','water','settlement','risk'];
+      const firstOff = order.find(l => !gameState.activeLayers.has(l));
+      toggleLayer(firstOff || order[0]);
+    }
+    function prevLayerToggle(){
+      const order = ['risk','settlement','water','roads'];
+      const firstOff = order.find(l => !gameState.activeLayers.has(l));
+      toggleLayer(firstOff || order[0]);
+    }
+    function handlePadButtonPress(btnIndex){
+      if(!throttle()) return;
+      switch(btnIndex){
+        case 15: rotateDirection(+1); break;
+        case 14: rotateDirection(-1); break;
+        case 12: prevLayerToggle(); break;
+        case 13: nextLayerToggle(); break;
+        case 0:  nextLayerToggle(); break;      // A
+        case 2:  prevLayerToggle(); break;      // X
+        case 9:  toggleVR(); break;             // Start
+        case 8:  toggleBEP(); break;            // Select/Back
+        case 1:  toggleLayer('risk'); break;    // B
+        case 3:  toggleLayer('water'); break;   // Y
+      }
+    }
+    function pollGamepads(){
+      const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+      if(!pads){ requestAnimationFrame(pollGamepads); return; }
+
+      if(pad.index === null){
+        for(let i=0;i<pads.length;i++){
+          if(pads[i]){
+            pad.index = i;
+            setPadStatus(`🎮 Kumanda: Bağlandı — ${pads[i].id}`);
+            break;
+          }
+        }
+      }
+
+      const gp = (pad.index !== null) ? pads[pad.index] : null;
+      if(gp){
+        const buttons = gp.buttons || [];
+        for(let i=0;i<buttons.length;i++){
+          const pressed = !!buttons[i]?.pressed;
+          const wasPressed = !!pad.lastButtons[i];
+          if(pressed && !wasPressed) handlePadButtonPress(i);
+          pad.lastButtons[i] = pressed;
+        }
+
+        const ax = gp.axes?.[0] ?? 0;
+        if(Math.abs(ax) > 0.7){
+          if(Math.abs(pad.lastAxes[0]) <= 0.7){
+            if(throttle()){
+              if(ax > 0) rotateDirection(+1);
+              else rotateDirection(-1);
+            }
+          }
+        }
+        pad.lastAxes[0] = ax;
+      } else {
+        if(pad.index !== null){
+          pad.index = null;
+          pad.lastButtons = [];
+          setPadStatus('🎮 Kumanda: Bağlı değil (Bluetooth ile yeniden bağla)');
+        }
+      }
+      requestAnimationFrame(pollGamepads);
+    }
+    window.addEventListener('gamepadconnected', (e)=>{
+      pad.index = e.gamepad.index;
+      pad.lastButtons = [];
+      setPadStatus(`🎮 Kumanda: Bağlandı — ${e.gamepad.id}`);
+    });
+    window.addEventListener('gamepaddisconnected', ()=>{
+      pad.index = null;
+      pad.lastButtons = [];
+      setPadStatus('🎮 Kumanda: Bağlı değil (Bluetooth ile yeniden bağla)');
+    });
+
+    // Keyboard fallback
+    window.addEventListener('keydown', (e)=>{
+      const k = e.key;
+      if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter',' ','Escape'].includes(k)) e.preventDefault();
+      if(!throttle()) return;
+      if(k === 'ArrowLeft') rotateDirection(-1);
+      if(k === 'ArrowRight') rotateDirection(+1);
+      if(k === 'ArrowUp') prevLayerToggle();
+      if(k === 'ArrowDown') nextLayerToggle();
+      if(k === 'Enter' || k === ' ') nextLayerToggle();
+      if(k === 'Escape') { if(gameState.vrOn) closeVR(); }
+    });
+
+    /* ===== Events ===== */
     function wire(){
-      // layer buttons
       document.querySelectorAll('.btn[data-layer]').forEach(btn=>{
         bindTap(btn, ()=> toggleLayer(btn.dataset.layer));
       });
-
-      // direction buttons
       document.querySelectorAll('.direction').forEach(btn=>{
         bindTap(btn, ()=> changeDirection(btn.dataset.direction));
       });
-
-      // info points
       document.querySelectorAll('.info').forEach(p=>{
         bindTap(p, ()=> clickInfoPoint(p.dataset.info));
       });
 
-      // quiz options (event delegation)
       const quizBox = document.getElementById('quiz');
       quizBox.addEventListener('touchend', (e)=>{
         const el = e.target.closest('.opt');
@@ -1336,32 +1402,25 @@
         selectQuizOption(parseInt(el.dataset.q,10), parseInt(el.dataset.o,10), el);
       });
 
-      // check quiz
       bindTap(document.getElementById('checkBtn'), checkQuiz);
-
-      // BEP
       bindTap(document.getElementById('bepBtn'), toggleBEP);
-
-      // VR
       bindTap(document.getElementById('vrBtn'), toggleVR);
       bindTap(document.getElementById('vrClose'), closeVR);
 
-      // VR HUD actions
       bindTap(document.getElementById('vrTopo'), ()=> toggleLayer('topography'));
       bindTap(document.getElementById('vrRoads'), ()=> toggleLayer('roads'));
       bindTap(document.getElementById('vrWater'), ()=> toggleLayer('water'));
       bindTap(document.getElementById('vrSettle'), ()=> toggleLayer('settlement'));
       bindTap(document.getElementById('vrRisk'), ()=> toggleLayer('risk'));
-
       bindTap(document.getElementById('vrDirPrev'), ()=> rotateDirection(-1));
       bindTap(document.getElementById('vrDirNext'), ()=> rotateDirection(+1));
-
       bindTap(document.getElementById('vrBep'), toggleBEP);
 
-      // VR overlay: prevent scroll
+      // Head tracking toggle
+      bindTap(document.getElementById('vrHeadBtn'), toggleHeadTracking);
+
       document.getElementById('vrOverlay').addEventListener('touchmove', e=>e.preventDefault(), {passive:false});
 
-      // resize/orientation
       window.addEventListener('resize', ()=>{
         if(gameState.vrOn) setVRRootClass();
         resizeAllCanvases();
@@ -1376,9 +1435,6 @@
       });
     }
 
-    /**********************
-     * Init
-     **********************/
     function init(){
       generateHeightmap();
       renderMissions();
@@ -1388,14 +1444,15 @@
       syncLayersToUI();
       wire();
 
-      // initial task/mission check
       checkMissions();
 
-      // first paint after layout
       requestAnimationFrame(()=>{
         resizeAllCanvases();
         requestRender(true);
       });
+
+      // gamepad polling start
+      requestAnimationFrame(pollGamepads);
     }
 
     init();
