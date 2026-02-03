@@ -3,296 +3,209 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>HaritaGöz - Türkiye Katmanlı VR Simülatör</title>
+  <title>HaritaGöz - Katmanlı Türkiye VR Simülatör</title>
 
-  <!-- Leaflet (CDN) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
+    *{margin:0;padding:0;box-sizing:border-box}
     :root{
-      --bg1:#0f1f2c; --bg2:#1a3343;
-      --card: rgba(255,255,255,0.06);
-      --border: rgba(255,255,255,0.12);
+      --bg1:#0f1f2c; --bg2:#183447;
+      --card:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.12);
       --green:#4CAF50; --amber:#FFC107; --blue:#2196F3; --red:#F44336;
     }
 
     body{
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
       color:#fff;
       overflow-x:hidden;
       -webkit-text-size-adjust:100%;
     }
 
-    /* Header */
+    /* HEADER */
     .header{
-      position: sticky;
-      top:0;
-      z-index: 20;
-      background: rgba(0,0,0,0.35);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255,255,255,0.12);
-      padding: 14px 14px;
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
+      position:sticky;top:0;z-index:30;
+      background:rgba(0,0,0,.35);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.12);
+      padding:12px 12px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
     }
-    .logo{
-      display:flex; align-items:center; gap:10px;
-      font-weight:800; font-size:20px; color: var(--green);
-      white-space:nowrap;
-    }
-
-    .header-right{
-      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-      justify-content:flex-end;
-    }
+    .logo{font-weight:900;color:var(--green);font-size:20px;display:flex;gap:8px;align-items:center}
+    .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
     .pill{
-      background: rgba(255,255,255,0.08);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius: 999px;
-      padding: 8px 10px;
-      display:flex; gap:8px; align-items:center;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:999px;
+      padding:7px 10px;
       font-size:13px;
+      display:flex;gap:6px;align-items:center
     }
-    .pill b{ color: var(--amber); font-size:14px; }
+    .pill b{color:var(--amber)}
     .btn{
-      border:none; cursor:pointer;
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-weight:800;
-      color:#fff;
-      background: rgba(255,255,255,0.10);
-      border:1px solid rgba(255,255,255,0.14);
-      transition: transform .12s ease, background .12s ease;
-      touch-action: manipulation;
+      border:none;cursor:pointer;border-radius:12px;
+      padding:10px 12px;font-weight:900;color:#fff;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      transition:transform .12s ease,opacity .12s ease;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
     }
-    .btn:active{ transform: scale(0.98); }
-    .btn-primary{ background: linear-gradient(135deg, var(--green), #8BC34A); border:none; }
-    .btn-blue{ background: linear-gradient(135deg, #1e88e5, #42a5f5); border:none; }
-    .btn-warn{ background: linear-gradient(135deg, #ff9800, #ffb300); border:none; color:#222; }
-    .btn-danger{ background: linear-gradient(135deg, #e53935, #ff5252); border:none; }
-    .btn-small{ padding:8px 10px; font-size:13px; }
+    .btn:active{transform:scale(.98)}
+    .btn-blue{background:linear-gradient(135deg,#1e88e5,#42a5f5);border:none}
+    .btn-green{background:linear-gradient(135deg,var(--green),#8BC34A);border:none}
+    .btn-warn{background:linear-gradient(135deg,#ff9800,#ffb300);border:none;color:#222}
+    .btn-danger{background:linear-gradient(135deg,#d32f2f,#ff5252);border:none}
 
-    .container{
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 16px 12px 28px;
-    }
-
+    .container{max-width:1200px;margin:0 auto;padding:14px 12px 26px}
     .section{
-      background: var(--card);
+      background:var(--card);
       border:1px solid var(--border);
-      border-radius: 18px;
-      padding: 14px;
-      margin: 14px 0;
-      backdrop-filter: blur(10px);
+      border-radius:18px;
+      padding:14px;
+      margin:12px 0;
+      backdrop-filter:blur(10px);
     }
-
     .section-title{
-      display:flex; align-items:center; gap:10px;
-      color: var(--green);
-      font-size: 20px;
-      font-weight: 900;
-      margin-bottom: 10px;
+      font-size:18px;font-weight:900;color:var(--green);
+      display:flex;gap:8px;align-items:center;margin-bottom:10px;
     }
 
-    /* Map frame (normal mode) */
     .map-frame{
-      border-radius: 16px;
+      border-radius:16px;
       overflow:hidden;
-      border: 2px solid rgba(76,175,80,0.45);
+      border:2px solid rgba(76,175,80,.45);
       background:#0b1218;
     }
-    #mapNormal{
-      width:100%;
-      height: 56vh;
-      min-height: 380px;
-    }
+    #mapNormal{width:100%;height:56vh;min-height:380px}
 
     .controls{
-      margin-top: 10px;
-      display:flex;
-      flex-wrap:wrap;
-      gap: 10px;
-      align-items:center;
-      justify-content:space-between;
+      display:flex;gap:10px;flex-wrap:wrap;
+      align-items:center;justify-content:space-between;
+      margin-top:10px;
     }
 
-    .layerbar{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-    }
-
+    .layerbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .layer-btn{
-      border:none;
-      padding: 12px 12px;
-      border-radius: 14px;
-      cursor:pointer;
-      font-weight: 900;
-      font-size: 14px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      touch-action: manipulation;
+      border:none;cursor:pointer;border-radius:14px;
+      padding:12px 12px;font-weight:900;font-size:14px;
+      display:flex;gap:8px;align-items:center;
+      transition:transform .12s ease,opacity .12s ease,filter .12s ease;
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
       user-select:none;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease, filter .12s ease, opacity .12s ease;
     }
-    .layer-btn:active{ transform: scale(0.98); }
-    .layer-btn.off{ opacity:0.55; filter: grayscale(0.85); }
-    .layer-topo{ background: linear-gradient(135deg, #6d4c41, #d2691e); color:#fff; }
-    .layer-osm{ background: linear-gradient(135deg, #ffd54f, #ffb300); color:#222; }
-    .layer-water{ background: linear-gradient(135deg, #1e88e5, #1565c0); color:#fff; }
-    .layer-settle{ background: linear-gradient(135deg, #ff7043, #f4511e); color:#fff; }
-    .layer-risk{ background: linear-gradient(135deg, #d32f2f, #7f0000); color:#fff; }
+    .layer-btn:active{transform:scale(.98)}
+    .layer-btn.off{opacity:.55;filter:grayscale(.85)}
+    .layer-topo{background:linear-gradient(135deg,#6d4c41,#d2691e);color:#fff}
+    .layer-water{background:linear-gradient(135deg,#1e88e5,#1565c0);color:#fff}
+    .layer-roads{background:linear-gradient(135deg,#ffd54f,#ffb300);color:#222}
+    .layer-settle{background:linear-gradient(135deg,#ff7043,#f4511e);color:#fff}
+    .layer-risk{background:linear-gradient(135deg,#d32f2f,#7f0000);color:#fff}
 
-    /* Extra panels */
-    .grid2{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+    .note{
+      font-size:13px;color:rgba(255,255,255,.8);line-height:1.45
     }
-    @media (max-width: 860px){
-      .grid2{ grid-template-columns: 1fr; }
-    }
-    .card{
-      background: rgba(255,255,255,0.06);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius: 16px;
-      padding: 12px;
-    }
-    .card h3{ font-size:16px; margin-bottom:8px; color:#e8f5e9; }
-    .muted{ color: rgba(255,255,255,0.75); font-size: 13px; line-height: 1.45; }
 
-    /* ===== VR MODE OVERLAY ===== */
+    /* ===== VR OVERLAY ===== */
     body.vr-lock{
-      overflow: hidden;
-      position: fixed;
+      overflow:hidden;
+      position:fixed;
       width:100%;
       height:100%;
       inset:0;
       touch-action:none;
     }
-
     #vrOverlay{
-      position: fixed;
-      inset:0;
-      z-index: 9999;
-      background: #000;
-      display:none;
+      position:fixed;inset:0;z-index:9999;
+      background:#000;display:none;
     }
-    #vrOverlay.on{ display:block; }
+    #vrOverlay.on{display:block}
 
-    /* two-eye layout */
     .vr-stage{
-      position:absolute;
-      inset:0;
-      display:flex;
-      flex-direction: row;
-      width:100%;
-      height:100%;
+      position:absolute;inset:0;
+      display:flex;width:100%;height:100%;
     }
-    .eye{
-      position: relative;
-      width:50%;
-      height:100%;
-      overflow:hidden;
-      background:#000;
-    }
-    .eye .map{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-    }
+    .eye{position:relative;width:50%;height:100%;overflow:hidden;background:#000}
+    .eye .map{position:absolute;inset:0;width:100%;height:100%}
 
-    /* VR HUD (must be clickable) */
+    /* VR HUD - clickable and always visible */
     .vr-hud{
       position:absolute;
       top: env(safe-area-inset-top, 10px);
-      left: 0;
-      right:0;
-      padding: 10px 10px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
+      left:0;right:0;
+      display:flex;gap:10px;flex-wrap:wrap;
       justify-content:center;
-      pointer-events: auto;   /* IMPORTANT */
-      z-index: 50;
+      padding:10px;
+      z-index:200;
+      pointer-events:auto;
     }
-    .vr-hud .btn, .vr-hud .layer-btn{
-      pointer-events:auto;     /* IMPORTANT */
-    }
+    .vr-hud *{pointer-events:auto}
 
+    /* VR Bottom controls */
     .vr-bottom{
       position:absolute;
       bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
-      left:0; right:0;
-      display:flex;
+      left:0;right:0;
+      display:flex;gap:10px;flex-wrap:wrap;
       justify-content:center;
-      gap:10px;
-      z-index: 50;
-      padding: 0 10px;
+      padding:0 10px;
+      z-index:200;
       pointer-events:auto;
     }
 
-    .hint{
+    /* Compass */
+    .compass{
       position:absolute;
-      left:12px;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 60px);
-      z-index: 60;
-      background: rgba(0,0,0,0.45);
-      border:1px solid rgba(255,255,255,0.18);
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      color: rgba(255,255,255,0.9);
-      max-width: 70ch;
+      right:12px;
+      top: calc(env(safe-area-inset-top, 10px) + 12px);
+      z-index:220;
+      background:rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.18);
+      padding:10px 12px;border-radius:14px;
+      min-width:110px;
+      text-align:center;
       pointer-events:none;
     }
+    .compass .dir{font-weight:900;color:#fff;font-size:14px}
+    .compass .deg{font-size:12px;color:rgba(255,255,255,.8)}
 
-    /* orientation hint */
     #rotateHint{
       display:none;
-      position:absolute;
-      inset:0;
-      z-index: 100;
-      background: rgba(0,0,0,0.85);
-      color:#fff;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      padding: 20px;
-      font-weight:900;
-      font-size: 18px;
+      position:absolute;inset:0;z-index:300;
+      background:rgba(0,0,0,.85);
+      align-items:center;justify-content:center;
+      padding:20px;text-align:center;
+      font-weight:900;font-size:18px;
     }
-    #rotateHint.on{ display:flex; }
+    #rotateHint.on{display:flex}
 
-    /* Leaflet tweaks */
-    .leaflet-control-attribution { font-size: 10px; }
+    /* Slight “3D feel” for VR: add depth by skewing overlays a bit */
+    .vr-3d{
+      filter: contrast(1.05) saturate(1.15);
+    }
+
+    /* Leaflet attribution small */
+    .leaflet-control-attribution{font-size:10px}
   </style>
 </head>
+
 <body>
   <div class="header">
     <div class="logo">🗺️ HaritaGöz</div>
-
-    <div class="header-right">
+    <div class="right">
       <div class="pill">Puan: <b id="score">0</b></div>
       <div class="pill">Seviye: <b id="level">1</b></div>
-
-      <button class="btn btn-small" id="bepBtn">BEP Modu</button>
-      <button class="btn btn-blue btn-small" id="vrBtn">🥽 VR Modu</button>
+      <button class="btn" id="bepBtn">BEP Modu</button>
+      <button class="btn btn-blue" id="vrBtn">🥽 VR Modu</button>
     </div>
   </div>
 
   <div class="container">
     <div class="section">
-      <div class="section-title">🎯 Türkiye Katmanlı Harita (Normal Mod)</div>
+      <div class="section-title">🏔️ Normal Mod – Türkiye Topografya + Katmanlar</div>
 
       <div class="map-frame">
         <div id="mapNormal"></div>
@@ -300,333 +213,349 @@
 
       <div class="controls">
         <div class="layerbar" id="layerBar">
-          <button class="layer-btn layer-topo" data-layer="topo">🏔️ Topografya</button>
-          <button class="layer-btn layer-osm" data-layer="osm">🛣️ Yollar/Harita</button>
-          <button class="layer-btn layer-water" data-layer="water">💧 Su</button>
-          <button class="layer-btn layer-settle" data-layer="settle">🏘️ Yerleşim</button>
-          <button class="layer-btn layer-risk" data-layer="risk">⚠️ Risk</button>
+          <!-- Topo always on (button only for info, not toggled) -->
+          <button class="layer-btn layer-topo" data-layer="topo" title="Topografya hep açık">🏔️ Topografya (Hep Açık)</button>
+
+          <!-- Others start OFF -->
+          <button class="layer-btn layer-water off" data-layer="water">💧 Su</button>
+          <button class="layer-btn layer-roads off" data-layer="roads">🛣️ Ulaşım</button>
+          <button class="layer-btn layer-settle off" data-layer="settle">🏘️ Yerleşim</button>
+          <button class="layer-btn layer-risk off" data-layer="risk">⚠️ Risk</button>
         </div>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn btn-primary" id="centerTR">🇹🇷 Türkiye’ye Ortala</button>
-          <button class="btn" id="resetUI">Sıfırla</button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-green" id="centerTR">🇹🇷 Türkiye’ye Ortala</button>
+          <button class="btn" id="resetBtn">Sıfırla</button>
         </div>
+      </div>
+
+      <div style="margin-top:10px" class="note">
+        İstediğin davranış: Topografya hep açık. Diğerleri kapalı başlar.
+        Butona basınca belirgin biçimde açılır, tekrar basınca kapanır.
+        Birden fazla katman aynı anda açık kalabilir.
       </div>
     </div>
 
     <div class="section">
-      <div class="section-title">📌 Notlar</div>
-      <div class="grid2">
-        <div class="card">
-          <h3>Katmanlar neden açılmıyordu?</h3>
-          <div class="muted">
-            VR’de genelde üstteki katman “tıklamayı yutar”. Bu sürümde HUD ve butonlarda
-            <b>pointer-events:auto</b> zorlandı ve iOS için <b>pointerdown/touchstart</b> ile güvence alındı.
-          </div>
-        </div>
-        <div class="card">
-          <h3>Bluetooth kumanda</h3>
-          <div class="muted">
-            Ok tuşlarıyla katmanlar arasında gezebilir, <b>Enter / Space</b> ile aç-kapat yapabilirsin.
-            Ayrıca tarayıcı desteklerse <b>Gamepad API</b> ile de yakalanır.
-          </div>
-        </div>
+      <div class="section-title">🎮 Kumanda Kullanımı</div>
+      <div class="note">
+        VR moddayken çoğu Bluetooth kumanda tarayıcıya “klavye” gibi sinyal yollar:
+        <b>Ok tuşları</b> = katman seç, <b>Enter/Space</b> = aç/kapat, <b>Esc</b> = VR kapat.
+        Ayrıca ekrandaki butonlara dokunarak da açıp kapatabilirsin.
       </div>
     </div>
   </div>
 
   <!-- VR Overlay -->
   <div id="vrOverlay" aria-hidden="true">
-    <div id="rotateHint">📱 Telefonu yatay çevir (VR için)</div>
+    <div id="rotateHint">📱 VR için telefonu <u>yatay</u> çevir</div>
 
     <div class="vr-stage" id="vrStage">
       <div class="eye">
-        <div class="map" id="mapLeft"></div>
+        <div class="map vr-3d" id="mapLeft"></div>
       </div>
       <div class="eye">
-        <div class="map" id="mapRight"></div>
+        <div class="map vr-3d" id="mapRight"></div>
       </div>
 
+      <!-- HUD -->
       <div class="vr-hud" id="vrHud">
-        <button class="layer-btn layer-topo" data-layer="topo">🏔️</button>
-        <button class="layer-btn layer-osm" data-layer="osm">🛣️</button>
-        <button class="layer-btn layer-water" data-layer="water">💧</button>
-        <button class="layer-btn layer-settle" data-layer="settle">🏘️</button>
-        <button class="layer-btn layer-risk" data-layer="risk">⚠️</button>
+        <button class="layer-btn layer-topo" data-layer="topo" title="Topo hep açık">🏔️</button>
+        <button class="layer-btn layer-water off" data-layer="water">💧</button>
+        <button class="layer-btn layer-roads off" data-layer="roads">🛣️</button>
+        <button class="layer-btn layer-settle off" data-layer="settle">🏘️</button>
+        <button class="layer-btn layer-risk off" data-layer="risk">⚠️</button>
 
         <button class="btn btn-warn" id="motionBtn">🎛 Baş İzleme İzni</button>
         <button class="btn btn-danger" id="vrCloseBtn">✖ VR Kapat</button>
       </div>
 
+      <div class="compass" id="compass">
+        <div class="dir" id="compassDir">N</div>
+        <div class="deg" id="compassDeg">0°</div>
+      </div>
+
       <div class="vr-bottom">
         <button class="btn" id="zoomOut">➖ Zoom</button>
         <button class="btn" id="zoomIn">➕ Zoom</button>
-        <button class="btn btn-primary" id="centerTR2">🇹🇷 Ortala</button>
-      </div>
-
-      <div class="hint" id="vrHint">
-        ⌨️ / 🎮 Kumanda: Ok tuşları = katman seç, Enter/Space = aç-kapat. <br/>
-        👆 Dokunarak da açabilirsin. Baş izleme için “Baş İzleme İzni”ne bas.
+        <button class="btn btn-green" id="centerTR2">🇹🇷 Ortala</button>
       </div>
     </div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <script>
-    /**************
-     * STATE
-     **************/
+    /*****************
+     * Helpers
+     *****************/
+    const $ = (id)=>document.getElementById(id);
+
+    function bindTap(el, fn){
+      // iOS güvenilir tıklama
+      el.addEventListener("pointerdown", (e)=>{ e.preventDefault(); fn(e); }, {passive:false});
+      el.addEventListener("touchstart", (e)=>{ e.preventDefault(); fn(e); }, {passive:false});
+      el.addEventListener("click", (e)=>{ e.preventDefault(); fn(e); }, {passive:false});
+    }
+
+    /*****************
+     * State
+     *****************/
     const state = {
-      score: 0,
-      level: 1,
-      bep: false,
+      score:0,
+      level:1,
+      bep:false,
 
-      // layers on/off
-      layers: { topo:true, osm:true, water:false, settle:false, risk:false },
+      // Topo always on
+      layers:{
+        topo:true,
+        water:false,
+        roads:false,
+        settle:false,
+        risk:false
+      },
 
-      // VR
-      vrOn: false,
-      activeLayerIndex: 0,
-      layerOrder: ["topo","osm","water","settle","risk"],
+      vrOn:false,
+      // VR kumanda seçim sırası topo hariç
+      layerOrder:["water","roads","settle","risk"],
+      activeIndex:0,
 
       // head tracking
-      motionEnabled: false,
-      yaw: 0,
-      pitch: 0,
-      lastPanTs: 0
+      motionEnabled:false,
+      headingDeg:0,
+      lastTs:0
     };
-
-    const $ = (id)=>document.getElementById(id);
 
     function addScore(p){
       state.score += p;
-      const newLevel = Math.floor(state.score / 200) + 1;
-      if(newLevel > state.level) state.level = newLevel;
+      const lv = Math.floor(state.score / 200) + 1;
+      if(lv > state.level) state.level = lv;
       $("score").textContent = state.score;
       $("level").textContent = state.level;
     }
 
-    /**************
-     * MAP LAYERS (Real tiles)
-     **************/
+    /*****************
+     * Map setup
+     *****************/
     const trCenter = [39.0, 35.0];
     const trZoom = 6;
 
-    // Normal map
-    const mapNormal = L.map("mapNormal", { zoomControl: true, preferCanvas:true })
+    // NORMAL MAP
+    const mapNormal = L.map("mapNormal", { zoomControl:true, preferCanvas:true })
       .setView(trCenter, trZoom);
 
-    // VR maps (created on demand)
-    let mapLeft = null;
-    let mapRight = null;
+    // --- Base Topo tile (always on)
+    const topo = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+      maxZoom:17,
+      attribution:"© OpenTopoMap, © OpenStreetMap contributors",
+      opacity: 1.0
+    }).addTo(mapNormal);
 
-    // Tile layers
-    // Topography: OpenTopoMap (real topo look)
-    const topoURL = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png";
-    const topoAttr = 'Map data: © OpenStreetMap contributors, SRTM | Map style: © OpenTopoMap';
-    function makeTopo(){ return L.tileLayer(topoURL, { maxZoom: 17, attribution: topoAttr, opacity: 0.92 }); }
+    // ---- OVERLAYS (start OFF)
+    // 1) Water overlay (more obvious)
+    const waterLayerNormal = L.layerGroup();
+    const waterLines = [
+      // (örnek) Karadeniz kıyı hattına yakın akışlar + İç Anadolu çizgisi
+      [[41.2, 28.8],[41.3, 31.2],[41.1, 33.2],[41.1, 35.2],[41.2, 37.2]],
+      [[39.9, 32.7],[39.4, 34.7],[38.9, 36.4],[37.9, 38.7],[37.0, 39.2]],
+      [[38.7, 26.9],[38.8, 28.3],[38.6, 29.6],[38.3, 30.6]]
+    ];
+    waterLines.forEach(p => L.polyline(p, {color:"#1ea7ff", weight:5, opacity:.85}).addTo(waterLayerNormal));
+    const lakes = [
+      ["Van Gölü",38.6,42.9,40000],
+      ["Tuz Gölü",38.8,33.3,35000],
+      ["Beyşehir",37.7,31.7,22000],
+      ["Eğirdir",37.9,30.9,18000]
+    ];
+    lakes.forEach(([n,lat,lng,r])=>{
+      L.circle([lat,lng],{radius:r,color:"#1ea7ff",fillColor:"#1ea7ff",fillOpacity:.25,weight:2})
+        .bindTooltip("💧 "+n).addTo(waterLayerNormal);
+    });
 
-    // Roads/Map: OSM standard tiles
-    const osmURL = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-    const osmAttr = '© OpenStreetMap contributors';
-    function makeOSM(){ return L.tileLayer(osmURL, { maxZoom: 19, attribution: osmAttr, opacity: 0.70 }); }
+    // 2) Roads overlay (more visible – HOT style)
+    const roadsTileNormal = L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+      maxZoom:19,
+      attribution:"© OpenStreetMap contributors",
+      opacity: 0.85
+    });
 
-    // Extra overlays (water lines, settlement points, risk polygons)
-    function makeWaterOverlay(map){
-      const group = L.layerGroup();
-      // A few example rivers-ish lines in Turkey for demo (not perfect GIS, but gives a water emphasis layer)
-      const lines = [
-        [[40.9, 29.1],[41.2, 31.2],[41.0, 33.0],[41.0, 35.0],[41.1, 37.0]],
-        [[39.9, 32.9],[39.3, 34.8],[38.8, 36.6],[37.9, 38.7],[37.0, 39.2]],
-        [[38.7, 26.9],[38.8, 28.2],[38.6, 29.6],[38.3, 30.5]]
-      ];
-      lines.forEach(path=>{
-        L.polyline(path, { color:"#2aa7ff", weight: 4, opacity: 0.75 }).addTo(group);
-      });
-      // A few lake markers
-      const lakes = [
-        {name:"Tuz Gölü", lat:38.8, lng:33.3},
-        {name:"Van Gölü", lat:38.6, lng:42.9},
-        {name:"Beyşehir", lat:37.7, lng:31.7},
-      ];
-      lakes.forEach(l=>{
-        L.circle([l.lat,l.lng], { radius: 30000, color:"#2aa7ff", fillColor:"#2aa7ff", fillOpacity:0.25, weight:2 })
-          .bindTooltip("💧 "+l.name)
-          .addTo(group);
-      });
-      return group;
+    // 3) Settlement overlay (major cities)
+    const settleLayerNormal = L.layerGroup();
+    const cities = [
+      ["İstanbul",41.0082,28.9784],["Ankara",39.9334,32.8597],["İzmir",38.4237,27.1428],
+      ["Bursa",40.195,29.06],["Antalya",36.8969,30.7133],["Adana",37.0,35.3213],
+      ["Gaziantep",37.0662,37.3833],["Konya",37.8715,32.4846],["Kayseri",38.7225,35.4875],
+      ["Trabzon",41.0015,39.7178],["Diyarbakır",37.9144,40.2306],["Samsun",41.2867,36.33]
+    ];
+    cities.forEach(([n,lat,lng])=>{
+      L.circleMarker([lat,lng],{
+        radius:8,color:"#ffcc80",fillColor:"#ff6d00",fillOpacity:.85,weight:2
+      }).bindTooltip("🏘️ "+n).addTo(settleLayerNormal);
+    });
+
+    // 4) Risk overlay (example polygons)
+    const riskLayerNormal = L.layerGroup();
+    L.polygon([[41.35,28.65],[41.45,29.25],[41.20,29.35],[41.10,28.85]],
+      {color:"#ff9800",fillColor:"#ff9800",fillOpacity:.25,weight:2}).bindTooltip("🟠 Sel riski (örnek)").addTo(riskLayerNormal);
+    L.polygon([[40.95,39.25],[41.20,39.95],[40.75,40.35],[40.55,39.70]],
+      {color:"#ff1744",fillColor:"#ff1744",fillOpacity:.22,weight:2}).bindTooltip("🔴 Heyelan riski (örnek)").addTo(riskLayerNormal);
+    L.polygon([[38.7,26.3],[39.5,28.0],[38.6,29.2],[37.8,27.9]],
+      {color:"#b71c1c",fillColor:"#b71c1c",fillOpacity:.18,weight:2}).bindTooltip("🔴 Yüksek risk (örnek)").addTo(riskLayerNormal);
+
+    function applyNormalLayers(){
+      // topo always on
+      // overlays: add/remove by state
+      if(state.layers.water){ if(!mapNormal.hasLayer(waterLayerNormal)) waterLayerNormal.addTo(mapNormal); }
+      else { if(mapNormal.hasLayer(waterLayerNormal)) mapNormal.removeLayer(waterLayerNormal); }
+
+      if(state.layers.roads){ if(!mapNormal.hasLayer(roadsTileNormal)) roadsTileNormal.addTo(mapNormal); }
+      else { if(mapNormal.hasLayer(roadsTileNormal)) mapNormal.removeLayer(roadsTileNormal); }
+
+      if(state.layers.settle){ if(!mapNormal.hasLayer(settleLayerNormal)) settleLayerNormal.addTo(mapNormal); }
+      else { if(mapNormal.hasLayer(settleLayerNormal)) mapNormal.removeLayer(settleLayerNormal); }
+
+      if(state.layers.risk){ if(!mapNormal.hasLayer(riskLayerNormal)) riskLayerNormal.addTo(mapNormal); }
+      else { if(mapNormal.hasLayer(riskLayerNormal)) mapNormal.removeLayer(riskLayerNormal); }
     }
 
-    function makeSettlementOverlay(map){
-      const group = L.layerGroup();
-      const cities = [
-        ["İstanbul",41.0082,28.9784],
-        ["Ankara",39.9334,32.8597],
-        ["İzmir",38.4237,27.1428],
-        ["Bursa",40.1950,29.0600],
-        ["Antalya",36.8969,30.7133],
-        ["Adana",37.0000,35.3213],
-        ["Gaziantep",37.0662,37.3833],
-        ["Konya",37.8715,32.4846],
-        ["Kayseri",38.7225,35.4875],
-        ["Trabzon",41.0015,39.7178],
-        ["Diyarbakır",37.9144,40.2306],
-        ["Samsun",41.2867,36.3300],
-      ];
-      cities.forEach(([name,lat,lng])=>{
-        L.circleMarker([lat,lng], {
-          radius: 7,
-          color:"#ffcc80",
-          fillColor:"#ff6d00",
-          fillOpacity: 0.75,
-          weight:2
-        }).bindTooltip("🏘️ "+name).addTo(group);
-      });
-      return group;
-    }
-
-    function makeRiskOverlay(map){
-      const group = L.layerGroup();
-
-      // Example risk zones (demo polygons)
-      const flood = L.polygon(
-        [[41.35, 28.65],[41.45, 29.25],[41.20, 29.35],[41.10, 28.85]],
-        { color:"#ff9800", fillColor:"#ff9800", fillOpacity:0.22, weight:2 }
-      ).bindTooltip("🟠 Sel Riski (örnek)");
-
-      const landslide = L.polygon(
-        [[40.95, 39.25],[41.20, 39.95],[40.75, 40.35],[40.55, 39.70]],
-        { color:"#ff1744", fillColor:"#ff1744", fillOpacity:0.22, weight:2 }
-      ).bindTooltip("🔴 Heyelan Riski (örnek)");
-
-      const seismic = L.polygon(
-        [[38.7, 26.3],[39.5, 28.0],[38.6, 29.2],[37.8, 27.9]],
-        { color:"#b71c1c", fillColor:"#b71c1c", fillOpacity:0.18, weight:2 }
-      ).bindTooltip("🔴 Yüksek Risk (örnek)");
-
-      flood.addTo(group);
-      landslide.addTo(group);
-      seismic.addTo(group);
-      return group;
-    }
-
-    function buildLayerPack(map){
-      return {
-        topo: makeTopo(),
-        osm: makeOSM(),
-        water: makeWaterOverlay(map),
-        settle: makeSettlementOverlay(map),
-        risk: makeRiskOverlay(map)
-      };
-    }
-
-    // Normal pack
-    const layersNormal = buildLayerPack(mapNormal);
-
-    function applyLayers(map, pack){
-      // Remove all, then add in correct stacking order (so üst üste düzgün)
-      Object.values(pack).forEach(l => { try{ map.removeLayer(l); }catch(e){} });
-
-      // Base-first: topo then osm (semi transparent), then overlays
-      if(state.layers.topo) pack.topo.addTo(map);
-      if(state.layers.osm) pack.osm.addTo(map);
-      if(state.layers.water) pack.water.addTo(map);
-      if(state.layers.settle) pack.settle.addTo(map);
-      if(state.layers.risk) pack.risk.addTo(map);
-    }
-
-    applyLayers(mapNormal, layersNormal);
-
-    /**************
-     * UI: Layer toggles
-     **************/
-    function setButtonStates(scope){
-      // scope: document or vrHud
-      const root = scope || document;
-      root.querySelectorAll(".layer-btn[data-layer]").forEach(btn=>{
+    /*****************
+     * Buttons state
+     *****************/
+    function setButtonStates(root){
+      const scope = root || document;
+      scope.querySelectorAll(".layer-btn[data-layer]").forEach(btn=>{
         const key = btn.dataset.layer;
-        const on = !!state.layers[key];
-        btn.classList.toggle("off", !on);
-        // highlight active selection for keyboard/gamepad navigation (VR)
-        if(scope === $("vrHud")){
-          const idx = state.layerOrder.indexOf(key);
-          btn.style.outline = (idx === state.activeLayerIndex) ? "3px solid rgba(255,255,255,0.75)" : "none";
+        if(key === "topo"){
+          btn.classList.remove("off");
+          return;
         }
+        btn.classList.toggle("off", !state.layers[key]);
       });
+
+      // VR kumanda seçimi görünür olsun
+      if(root === $("vrHud")){
+        const keys = state.layerOrder;
+        scope.querySelectorAll(".layer-btn[data-layer]").forEach(btn=>{
+          const k = btn.dataset.layer;
+          if(keys.includes(k)){
+            const idx = keys.indexOf(k);
+            btn.style.outline = (idx === state.activeIndex) ? "3px solid rgba(255,255,255,.85)" : "none";
+          }else{
+            btn.style.outline = "none";
+          }
+        });
+      }
     }
 
     function toggleLayer(key){
-      // topography can be toggled too, but usually keep it on. We'll allow toggling.
+      if(key === "topo"){
+        // topo always on - do nothing
+        addScore(1);
+        return;
+      }
       state.layers[key] = !state.layers[key];
-      addScore(5);
-
-      applyLayers(mapNormal, layersNormal);
+      applyNormalLayers();
       if(mapLeft && mapRight){
-        applyLayers(mapLeft, layersLeft);
-        applyLayers(mapRight, layersRight);
+        applyVRLayers();
       }
       setButtonStates(document);
       if($("vrHud")) setButtonStates($("vrHud"));
+      addScore(5);
     }
 
-    // Fix iOS tap reliability: pointerdown + touchstart
-    function bindTap(el, handler){
-      el.addEventListener("pointerdown", (e)=>{ e.preventDefault(); handler(e); }, { passive:false });
-      el.addEventListener("touchstart", (e)=>{ e.preventDefault(); handler(e); }, { passive:false });
-      el.addEventListener("click", (e)=>{ e.preventDefault(); handler(e); }, { passive:false });
-    }
-
-    // Bind normal layer bar
+    /*****************
+     * Bind normal controls
+     *****************/
     document.querySelectorAll("#layerBar .layer-btn[data-layer]").forEach(btn=>{
-      bindTap(btn, ()=> toggleLayer(btn.dataset.layer));
+      bindTap(btn, ()=>toggleLayer(btn.dataset.layer));
     });
 
-    /**************
-     * BEP MODE (simple)
-     **************/
-    function toggleBEP(){
-      state.bep = !state.bep;
-      document.body.style.fontSize = state.bep ? "18px" : "";
-      $("bepBtn").textContent = state.bep ? "Normal Mod" : "BEP Modu";
-      addScore(2);
-    }
-    bindTap($("bepBtn"), toggleBEP);
-
-    /**************
-     * Center + reset
-     **************/
     bindTap($("centerTR"), ()=>{
-      mapNormal.setView(trCenter, trZoom, { animate:true });
+      mapNormal.setView(trCenter, trZoom, {animate:true});
       addScore(2);
     });
 
-    bindTap($("resetUI"), ()=>{
-      state.layers = { topo:true, osm:true, water:false, settle:false, risk:false };
-      state.activeLayerIndex = 0;
-      applyLayers(mapNormal, layersNormal);
-      if(mapLeft && mapRight){
-        applyLayers(mapLeft, layersLeft);
-        applyLayers(mapRight, layersRight);
-      }
+    bindTap($("resetBtn"), ()=>{
+      state.layers.water=false; state.layers.roads=false; state.layers.settle=false; state.layers.risk=false;
+      applyNormalLayers();
       setButtonStates(document);
       if($("vrHud")) setButtonStates($("vrHud"));
       addScore(1);
     });
 
-    /**************
-     * VR MODE (two synced maps)
-     **************/
-    let layersLeft = null;
-    let layersRight = null;
+    /*****************
+     * BEP
+     *****************/
+    bindTap($("bepBtn"), ()=>{
+      state.bep = !state.bep;
+      document.body.style.fontSize = state.bep ? "18px" : "";
+      $("bepBtn").textContent = state.bep ? "Normal Mod" : "BEP Modu";
+      addScore(2);
+    });
+
+    /*****************
+     * VR MODE
+     *****************/
+    let mapLeft=null, mapRight=null;
+    let topoLeft=null, topoRight=null;
+    let waterLeft=null, waterRight=null;
+    let roadsLeft=null, roadsRight=null;
+    let settleLeft=null, settleRight=null;
+    let riskLeft=null, riskRight=null;
 
     function isLandscape(){
       return window.matchMedia("(orientation: landscape)").matches;
     }
-
     function updateRotateHint(){
-      const hint = $("rotateHint");
-      if(state.vrOn && !isLandscape()) hint.classList.add("on");
-      else hint.classList.remove("on");
+      $("rotateHint").classList.toggle("on", state.vrOn && !isLandscape());
+    }
+
+    function buildOverlayFor(map){
+      const water = L.layerGroup();
+      waterLines.forEach(p => L.polyline(p, {color:"#1ea7ff", weight:5, opacity:.85}).addTo(water));
+      lakes.forEach(([n,lat,lng,r])=>{
+        L.circle([lat,lng],{radius:r,color:"#1ea7ff",fillColor:"#1ea7ff",fillOpacity:.25,weight:2})
+          .bindTooltip("💧 "+n).addTo(water);
+      });
+
+      const settle = L.layerGroup();
+      cities.forEach(([n,lat,lng])=>{
+        L.circleMarker([lat,lng],{
+          radius:8,color:"#ffcc80",fillColor:"#ff6d00",fillOpacity:.85,weight:2
+        }).bindTooltip("🏘️ "+n).addTo(settle);
+      });
+
+      const risk = L.layerGroup();
+      L.polygon([[41.35,28.65],[41.45,29.25],[41.20,29.35],[41.10,28.85]],
+        {color:"#ff9800",fillColor:"#ff9800",fillOpacity:.25,weight:2}).addTo(risk);
+      L.polygon([[40.95,39.25],[41.20,39.95],[40.75,40.35],[40.55,39.70]],
+        {color:"#ff1744",fillColor:"#ff1744",fillOpacity:.22,weight:2}).addTo(risk);
+      L.polygon([[38.7,26.3],[39.5,28.0],[38.6,29.2],[37.8,27.9]],
+        {color:"#b71c1c",fillColor:"#b71c1c",fillOpacity:.18,weight:2}).addTo(risk);
+
+      return { water, settle, risk };
+    }
+
+    function applyVRLayers(){
+      // topo always on (already added)
+      function apply(map, water, roads, settle, risk){
+        if(state.layers.water){ if(!map.hasLayer(water)) water.addTo(map); } else { if(map.hasLayer(water)) map.removeLayer(water); }
+        if(state.layers.roads){ if(!map.hasLayer(roads)) roads.addTo(map); } else { if(map.hasLayer(roads)) map.removeLayer(roads); }
+        if(state.layers.settle){ if(!map.hasLayer(settle)) settle.addTo(map); } else { if(map.hasLayer(settle)) map.removeLayer(settle); }
+        if(state.layers.risk){ if(!map.hasLayer(risk)) risk.addTo(map); } else { if(map.hasLayer(risk)) map.removeLayer(risk); }
+      }
+      apply(mapLeft,  waterLeft,  roadsLeft,  settleLeft,  riskLeft);
+      apply(mapRight, waterRight, roadsRight, settleRight, riskRight);
+    }
+
+    function syncMaps(a,b){
+      let lock=false;
+      a.on("move", ()=>{
+        if(lock) return;
+        lock=true;
+        b.setView(a.getCenter(), a.getZoom(), {animate:false});
+        lock=false;
+      });
     }
 
     function enterVR(){
@@ -635,66 +564,59 @@
       document.body.classList.add("vr-lock");
       updateRotateHint();
 
-      // Create VR maps once
       if(!mapLeft){
+        // create maps once
         mapLeft = L.map("mapLeft", { zoomControl:false, attributionControl:false, preferCanvas:true })
           .setView(mapNormal.getCenter(), mapNormal.getZoom());
+
         mapRight = L.map("mapRight", { zoomControl:false, attributionControl:false, preferCanvas:true })
           .setView(mapNormal.getCenter(), mapNormal.getZoom());
 
-        layersLeft = buildLayerPack(mapLeft);
-        layersRight = buildLayerPack(mapRight);
+        topoLeft = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom:17, opacity:1.0 }).addTo(mapLeft);
+        topoRight= L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom:17, opacity:1.0 }).addTo(mapRight);
 
-        applyLayers(mapLeft, layersLeft);
-        applyLayers(mapRight, layersRight);
+        // overlays
+        const oL = buildOverlayFor(mapLeft);
+        const oR = buildOverlayFor(mapRight);
 
-        // Keep both VR maps synced with each other
-        const sync = (src, dst) => {
-          src.on("move", ()=>{
-            const c = src.getCenter(), z = src.getZoom();
-            dst.setView(c, z, { animate:false });
-          });
-        };
-        sync(mapLeft, mapRight);
-        sync(mapRight, mapLeft);
+        waterLeft = oL.water; settleLeft=oL.settle; riskLeft=oL.risk;
+        waterRight= oR.water; settleRight=oR.settle; riskRight=oR.risk;
 
-        // Also sync from normal -> VR when enter
-        const c = mapNormal.getCenter(), z = mapNormal.getZoom();
-        mapLeft.setView(c, z, { animate:false });
-        mapRight.setView(c, z, { animate:false });
-      }else{
-        // Already created -> just resize + sync
-        setTimeout(()=>{
-          mapLeft.invalidateSize();
-          mapRight.invalidateSize();
-          const c = mapNormal.getCenter(), z = mapNormal.getZoom();
-          mapLeft.setView(c, z, { animate:false });
-          mapRight.setView(c, z, { animate:false });
-        }, 50);
+        roadsLeft = L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", { maxZoom:19, opacity:0.85 });
+        roadsRight= L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", { maxZoom:19, opacity:0.85 });
+
+        applyVRLayers();
+
+        syncMaps(mapLeft, mapRight);
+        syncMaps(mapRight, mapLeft);
       }
 
-      // Bind VR HUD buttons (only once per open)
+      // resize + sync view with normal
+      setTimeout(()=>{
+        mapLeft.invalidateSize(); mapRight.invalidateSize();
+        mapLeft.setView(mapNormal.getCenter(), mapNormal.getZoom(), {animate:false});
+        mapRight.setView(mapNormal.getCenter(), mapNormal.getZoom(), {animate:false});
+      }, 60);
+
+      // bind VR HUD buttons once
       $("vrHud").querySelectorAll(".layer-btn[data-layer]").forEach(btn=>{
         if(btn.dataset.bound) return;
         btn.dataset.bound = "1";
-        bindTap(btn, ()=> toggleLayer(btn.dataset.layer));
+        bindTap(btn, ()=>toggleLayer(btn.dataset.layer));
       });
 
+      // VR controls
       bindTap($("vrCloseBtn"), exitVR);
       bindTap($("zoomIn"), ()=>{ mapLeft.zoomIn(); addScore(1); });
       bindTap($("zoomOut"), ()=>{ mapLeft.zoomOut(); addScore(1); });
       bindTap($("centerTR2"), ()=>{
-        mapLeft.setView(trCenter, trZoom, { animate:true });
+        mapLeft.setView(trCenter, trZoom, {animate:true});
         addScore(2);
       });
-
-      // Motion permission button
       bindTap($("motionBtn"), requestMotion);
 
-      // Make sure buttons reflect state
       setButtonStates(document);
       setButtonStates($("vrHud"));
-
       addScore(10);
     }
 
@@ -703,8 +625,6 @@
       $("vrOverlay").classList.remove("on");
       document.body.classList.remove("vr-lock");
       updateRotateHint();
-
-      // stop motion
       state.motionEnabled = false;
       $("motionBtn").textContent = "🎛 Baş İzleme İzni";
       addScore(5);
@@ -715,32 +635,25 @@
     window.addEventListener("resize", ()=>{
       if(state.vrOn){
         updateRotateHint();
-        if(mapLeft && mapRight){
-          mapLeft.invalidateSize();
-          mapRight.invalidateSize();
-        }
+        if(mapLeft){ mapLeft.invalidateSize(); mapRight.invalidateSize(); }
       }
-    }, { passive:true });
+    }, {passive:true});
 
     window.addEventListener("orientationchange", ()=>{
       if(state.vrOn){
         setTimeout(()=>{
           updateRotateHint();
-          if(mapLeft && mapRight){
-            mapLeft.invalidateSize();
-            mapRight.invalidateSize();
-          }
+          if(mapLeft){ mapLeft.invalidateSize(); mapRight.invalidateSize(); }
         }, 250);
       }
     });
 
-    /**************
-     * Head tracking (DeviceOrientation) - best effort on iOS
-     **************/
+    /*****************
+     * Head tracking (best effort)
+     *****************/
     async function requestMotion(){
       try{
-        if(typeof DeviceOrientationEvent !== "undefined" &&
-           typeof DeviceOrientationEvent.requestPermission === "function"){
+        if(typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function"){
           const res = await DeviceOrientationEvent.requestPermission();
           if(res !== "granted") throw new Error("İzin verilmedi");
         }
@@ -748,117 +661,88 @@
         $("motionBtn").textContent = "✅ Baş İzleme Açık";
         addScore(5);
       }catch(e){
-        alert("iOS’ta baş izleme için izin gerekebilir. Ayarlar > Safari > Hareket ve Yön erişimini kontrol edin.\n\nDetay: " + e.message);
+        alert("Baş izleme için iOS izin vermedi.\nAyarlar > Safari > Hareket & Yön erişimini kontrol et.\n\nDetay: " + e.message);
       }
     }
 
+    function headingToDir(deg){
+      const dirs = ["N","NE","E","SE","S","SW","W","NW"];
+      const idx = Math.round(((deg%360)+360)%360 / 45) % 8;
+      return dirs[idx];
+    }
+
+    // “kafayı çevirince haritada dönelim” hissi için:
+    // 1) map’i hafif pan ediyoruz
+    // 2) göz container’ı çok küçük rotasyonla dönüyor (tam harita rotasyonu değil ama hissi güçlendirir)
     window.addEventListener("deviceorientation", (e)=>{
       if(!state.vrOn || !state.motionEnabled || !mapLeft) return;
 
-      // e.alpha: yaw-like (0-360). We'll do a gentle pan.
       const now = performance.now();
-      if(now - state.lastPanTs < 40) return; // throttle
-      state.lastPanTs = now;
+      if(now - state.lastTs < 40) return; // throttle
+      state.lastTs = now;
 
-      const alpha = (e.alpha ?? 0);
-      const beta = (e.beta ?? 0);
+      const alpha = (e.alpha ?? 0); // 0..360
+      const beta  = (e.beta ?? 0);  // -180..180
 
-      // normalize
-      // yaw: map pan east/west
-      // pitch: map pan north/south
-      const yaw = ((alpha + 540) % 360) - 180;  // -180..180
-      const pitch = Math.max(-45, Math.min(45, beta)); // clamp
+      // heading
+      const heading = ((alpha % 360) + 360) % 360;
+      state.headingDeg = heading;
 
-      // convert to small lat/lng delta depending on zoom
+      $("compassDeg").textContent = Math.round(heading) + "°";
+      $("compassDir").textContent = headingToDir(heading);
+
+      // pan based on yaw (alpha) and pitch (beta)
+      const yaw = ((heading + 540) % 360) - 180; // -180..180
+      const pitch = Math.max(-35, Math.min(35, beta));
+
       const z = mapLeft.getZoom();
-      const scale = 0.0008 * Math.pow(2, (7 - z)); // smaller when zoom in
+      const scale = 0.0009 * Math.pow(2, (7 - z));
+
       const dx = yaw * scale;
       const dy = pitch * scale;
 
       const c = mapLeft.getCenter();
       const next = L.latLng(c.lat + (-dy), c.lng + (dx));
-      mapLeft.panTo(next, { animate:false });
-    }, { passive:true });
+      mapLeft.panTo(next, {animate:false});
 
-    /**************
-     * Keyboard / Bluetooth controller (acts as keyboard)
-     **************/
-    function vrLayerSelect(delta){
-      state.activeLayerIndex = (state.activeLayerIndex + delta + state.layerOrder.length) % state.layerOrder.length;
+      // tiny rotation effect (visual)
+      const rot = Math.max(-8, Math.min(8, yaw / 18));
+      $("mapLeft").style.transform = `rotate(${rot}deg)`;
+      $("mapRight").style.transform = `rotate(${rot}deg)`;
+    }, {passive:true});
+
+    /*****************
+     * Bluetooth kumanda / klavye
+     *****************/
+    function selectDelta(d){
+      const n = state.layerOrder.length;
+      state.activeIndex = (state.activeIndex + d + n) % n;
       setButtonStates($("vrHud"));
     }
 
     document.addEventListener("keydown", (e)=>{
-      // Works in normal too, but only meaningful in VR
       if(!state.vrOn) return;
 
       if(e.key === "ArrowLeft" || e.key === "ArrowUp"){
         e.preventDefault();
-        vrLayerSelect(-1);
+        selectDelta(-1);
       }else if(e.key === "ArrowRight" || e.key === "ArrowDown"){
         e.preventDefault();
-        vrLayerSelect(+1);
+        selectDelta(+1);
       }else if(e.key === "Enter" || e.key === " "){
         e.preventDefault();
-        const key = state.layerOrder[state.activeLayerIndex];
+        const key = state.layerOrder[state.activeIndex];
         toggleLayer(key);
       }else if(e.key.toLowerCase() === "escape"){
         e.preventDefault();
         exitVR();
       }
-    }, { passive:false });
+    }, {passive:false});
 
-    /**************
-     * Gamepad API (best effort)
-     **************/
-    function pollGamepad(){
-      if(!state.vrOn) return requestAnimationFrame(pollGamepad);
-      const gps = navigator.getGamepads ? navigator.getGamepads() : [];
-      const gp = gps && gps[0];
-      if(gp){
-        // D-pad / axis crude mapping
-        const ax0 = gp.axes?.[0] ?? 0;
-        const ax1 = gp.axes?.[1] ?? 0;
-
-        // buttons typical: 12 up, 13 down, 14 left, 15 right
-        const up = gp.buttons?.[12]?.pressed;
-        const down = gp.buttons?.[13]?.pressed;
-        const left = gp.buttons?.[14]?.pressed;
-        const right = gp.buttons?.[15]?.pressed;
-        const a = gp.buttons?.[0]?.pressed || gp.buttons?.[1]?.pressed; // A/B
-        const back = gp.buttons?.[8]?.pressed;
-
-        // simple edge detection by timestamps
-        const t = performance.now();
-        pollGamepad._last = pollGamepad._last || { t:0, up:false, down:false, left:false, right:false, a:false, back:false };
-        if(t - pollGamepad._last.t > 160){
-          if((left && !pollGamepad._last.left) || (up && !pollGamepad._last.up) || (ax0 < -0.7) || (ax1 < -0.7)){
-            vrLayerSelect(-1); pollGamepad._last.t = t;
-          }
-          if((right && !pollGamepad._last.right) || (down && !pollGamepad._last.down) || (ax0 > 0.7) || (ax1 > 0.7)){
-            vrLayerSelect(+1); pollGamepad._last.t = t;
-          }
-          if(a && !pollGamepad._last.a){
-            const key = state.layerOrder[state.activeLayerIndex];
-            toggleLayer(key);
-            pollGamepad._last.t = t;
-          }
-          if(back && !pollGamepad._last.back){
-            exitVR();
-            pollGamepad._last.t = t;
-          }
-        }
-        pollGamepad._last.up = !!up; pollGamepad._last.down = !!down;
-        pollGamepad._last.left = !!left; pollGamepad._last.right = !!right;
-        pollGamepad._last.a = !!a; pollGamepad._last.back = !!back;
-      }
-      requestAnimationFrame(pollGamepad);
-    }
-    requestAnimationFrame(pollGamepad);
-
-    /**************
-     * Init UI
-     **************/
+    /*****************
+     * Init
+     *****************/
+    applyNormalLayers();
     setButtonStates(document);
     addScore(0);
   </script>
