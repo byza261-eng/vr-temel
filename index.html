@@ -1,112 +1,59 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Temel VR – HaritaGöz</title>
-
-  <!-- A-Frame (WebVR/WebXR) -->
-  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iOS VR Güvenli Başlatma</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
   <style>
     body { margin: 0; background: black; }
-    #startBtn {
+    button {
       position: fixed;
-      top: 20px;
+      top: 45%;
       left: 50%;
-      transform: translateX(-50%);
-      z-index: 999;
-      padding: 15px 25px;
-      font-size: 18px;
-      background: #00c853;
-      color: black;
+      transform: translate(-50%, -50%);
+      padding: 20px 30px;
+      font-size: 20px;
+      background: #00e676;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-weight: bold;
+      z-index: 999;
     }
   </style>
 </head>
 
 <body>
 
-<button id="startBtn">VR BAŞLAT</button>
-
-<a-scene
-  vr-mode-ui="enabled: true"
-  embedded
-  device-orientation-permission-ui="enabled: true">
-
-  <!-- Kamera (gyro + VR) -->
-  <a-entity id="rig">
-    <a-camera
-      position="0 1.6 0"
-      look-controls="enabled: true"
-      wasd-controls="enabled: false">
-    </a-camera>
-  </a-entity>
-
-  <!-- Zemin -->
-  <a-plane
-    rotation="-90 0 0"
-    width="50"
-    height="50"
-    color="#4CAF50">
-  </a-plane>
-
-  <!-- Dağ (topografya temsili) -->
-  <a-cone
-    position="-2 1 -4"
-    radius-bottom="1.5"
-    radius-top="0.1"
-    height="3"
-    color="#8D6E63">
-  </a-cone>
-
-  <!-- Su -->
-  <a-cylinder
-    position="2 0.25 -3"
-    radius="1"
-    height="0.5"
-    color="#2196F3"
-    opacity="0.8">
-  </a-cylinder>
-
-  <!-- Risk alanı -->
-  <a-sphere
-    position="0 1 -6"
-    radius="1"
-    color="#F44336"
-    opacity="0.6">
-  </a-sphere>
-
-  <!-- Gökyüzü -->
-  <a-sky color="#87CEEB"></a-sky>
-
-</a-scene>
+<button id="btn">SAHNEYİ BAŞLAT</button>
 
 <script>
-  const btn = document.getElementById("startBtn");
+document.getElementById("btn").addEventListener("click", async () => {
 
-  btn.addEventListener("click", async () => {
-    btn.style.display = "none";
-
-    if (typeof DeviceOrientationEvent !== "undefined" &&
-        typeof DeviceOrientationEvent.requestPermission === "function") {
-      try {
-        const permission = await DeviceOrientationEvent.requestPermission();
-        if (permission !== "granted") {
-          alert("Hareket sensörü izni gerekli");
-        }
-      } catch (e) {
-        console.log(e);
-      }
+  // iOS sensör izni
+  if (typeof DeviceOrientationEvent !== "undefined" &&
+      typeof DeviceOrientationEvent.requestPermission === "function") {
+    const p = await DeviceOrientationEvent.requestPermission();
+    if (p !== "granted") {
+      alert("Sensör izni gerekli");
+      return;
     }
-  });
+  }
 
-  // Bluetooth gamepad algılama (hazır altyapı)
-  window.addEventListener("gamepadconnected", (e) => {
-    console.log("Gamepad bağlandı:", e.gamepad.id);
-  });
+  // SAHNEYİ SONRADAN OLUŞTUR
+  document.body.innerHTML = `
+    <a-scene>
+      <a-sky color="#87CEEB"></a-sky>
+
+      <a-plane rotation="-90 0 0" width="50" height="50" color="#7BC8A4"></a-plane>
+
+      <a-box position="0 1.5 -3" rotation="0 45 0" color="#FF5722"></a-box>
+
+      <a-camera position="0 1.6 0" look-controls></a-camera>
+    </a-scene>
+  `;
+});
 </script>
 
 </body>
