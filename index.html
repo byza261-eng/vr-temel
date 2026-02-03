@@ -3,85 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>HaritaGöz - Mobil + VR Uyumlu</title>
+  <title>HaritaGöz - Mobil + VR Tam Sığdırma</title>
 
   <style>
-    /* ====== RESET ====== */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    :root{
-      /* Tasarımın "referans" boyutu (sığdırma buna göre yapılır) */
-      --baseW: 1200;
-      --baseH: 820;
-    }
-
-    html, body{
-      width: 100%;
-      height: 100%;
-      overflow: hidden;          /* sayfa scroll yok */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html,body{
+      width:100%; height:100%;
+      overflow:hidden;                 /* sayfa scroll yok */
       background: linear-gradient(135deg,#1a2a3a 0%,#2d4a5c 100%);
+      color:#fff;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
-    body{
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: #fff;
-    }
 
-    /* ====== EKRANA SIĞDIRMA: appScale ile tüm UI tek parça küçülür ====== */
-    #screen{
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
-    }
+    #screen{ width:100vw; height:100vh; overflow:hidden; position:relative; }
     #app{
-      width: calc(var(--baseW) * 1px);
-      height: calc(var(--baseH) * 1px);
+      width: 1200px;                   /* tasarım genişliği */
+      /* yükseklik dinamik, JS ölçüp scale eder */
       transform-origin: top left;
       will-change: transform;
     }
 
-    /* ====== HEADER ====== */
+    /* HEADER */
     .header{
-      height: 76px;
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
       background: rgba(0,0,0,.28);
       backdrop-filter: blur(10px);
       border-bottom: 2px solid rgba(76,175,80,.30);
+      padding: 14px 18px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
     }
     .logo{
-      font-size: 26px;
-      font-weight: 900;
-      color: #4CAF50;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      white-space: nowrap;
+      font-size: 26px; font-weight: 900; color:#4CAF50;
+      display:flex; align-items:center; gap:10px; white-space:nowrap;
     }
-    .stats{
-      display: flex;
-      gap: 14px;
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-    .stat-item{ text-align: center; min-width: 70px; }
-    .stat-value{ font-size: 22px; font-weight: 900; color: #FFC107; }
-    .stat-label{ font-size: 12px; color: #B0BEC5; }
+    .stats{ display:flex; gap:14px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+    .stat-item{ text-align:center; min-width:70px; }
+    .stat-value{ font-size:22px; font-weight:900; color:#FFC107; }
+    .stat-label{ font-size:12px; color:#B0BEC5; }
 
     .pill{
-      border: none;
-      border-radius: 20px;
+      border:none; border-radius:20px;
       padding: 10px 16px;
-      color: #fff;
-      font-weight: 800;
-      cursor: pointer;
-      user-select: none;
-      touch-action: manipulation;
-      transition: transform .15s;
+      color:#fff; font-weight:900;
+      cursor:pointer; user-select:none; touch-action: manipulation;
+      transition: transform .12s;
     }
     .pill:hover{ transform: scale(1.02); }
     .bep{ background:#2196F3; }
@@ -89,13 +54,12 @@
     .vr{ background:#6A1B9A; }
     .vr.active{ background:#D32F2F; }
 
-    /* ====== BODY LAYOUT ====== */
+    /* LAYOUT */
     .content{
-      height: calc(var(--baseH) * 1px - 76px);
       padding: 14px 16px;
-      display: grid;
-      grid-template-columns: 1.3fr .7fr;
-      gap: 14px;
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap:14px;
     }
 
     .card{
@@ -104,19 +68,18 @@
       border-radius: 18px;
       backdrop-filter: blur(10px);
       padding: 16px;
-      overflow: hidden;
+      overflow:hidden;
     }
+
     .title{
       font-size: 22px;
       font-weight: 900;
-      color: #4CAF50;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      color:#4CAF50;
+      display:flex; align-items:center; gap:10px;
       margin-bottom: 12px;
     }
 
-    /* ====== SIMULATOR ====== */
+    /* SIM */
     .task{
       background: rgba(255,193,7,.18);
       border: 2px solid #FFC107;
@@ -127,21 +90,20 @@
     .task b{ color:#FFC107; display:block; margin-bottom:6px; }
 
     .sim{
-      background: #121212;
-      border: 3px solid #4CAF50;
-      border-radius: 16px;
-      padding: 14px;
-      overflow: hidden;
+      background:#121212;
+      border:3px solid #4CAF50;
+      border-radius:16px;
+      padding:14px;
+      overflow:hidden;
     }
     .viewport{
-      width: 100%;
-      height: 360px;
-      border-radius: 12px;
-      position: relative;
-      overflow: hidden;
+      width:100%;
+      height:360px;
+      border-radius:12px;
+      position:relative;
+      overflow:hidden;
       background: linear-gradient(to bottom, #87CEEB 0%, #90EE90 55%, #8B4513 100%);
     }
-
     .layers{ position:absolute; inset:0; pointer-events:none; }
     .layer{ position:absolute; inset:0; transition: opacity .2s; }
     .hidden{ opacity:0; }
@@ -175,39 +137,34 @@
     }
 
     .info{
-      position: absolute;
+      position:absolute;
       padding: 9px 12px;
       border-radius: 12px;
       background: rgba(76,175,80,.92);
-      font-weight: 800;
+      font-weight: 900;
       font-size: 13px;
-      cursor: pointer;
-      user-select: none;
+      cursor:pointer;
+      user-select:none;
       touch-action: manipulation;
       box-shadow: 0 6px 16px rgba(0,0,0,.35);
     }
 
     .controls{
-      margin-top: 12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      margin-top:12px;
+      display:flex; flex-wrap:wrap; gap:8px;
     }
     .btn{
-      border: none;
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-weight: 900;
-      cursor: pointer;
-      user-select: none;
+      border:none;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
       touch-action: manipulation;
       transition: transform .12s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display:flex; align-items:center; gap:8px;
     }
     .btn:hover{ transform: translateY(-1px); }
-
     .btn.topo{ background: linear-gradient(135deg,#8B4513,#D2691E); color:#fff; }
     .btn.roads{ background: linear-gradient(135deg,#FFD700,#FFA500); color:#1c1c1c; }
     .btn.water{ background: linear-gradient(135deg,#1E90FF,#4169E1); color:#fff; }
@@ -216,37 +173,28 @@
     .inactive{ opacity:.40; filter: grayscale(1); }
 
     .dir{
-      margin-top: 12px;
-      display: grid;
+      margin-top:12px;
+      display:grid;
       grid-template-columns: repeat(3, 56px);
-      gap: 8px;
-      justify-content: center;
+      gap:8px;
+      justify-content:center;
     }
     .dir button{
-      width: 56px;
-      height: 44px;
-      border: none;
-      border-radius: 12px;
-      background: #2196F3;
+      width:56px; height:44px;
+      border:none; border-radius:12px;
+      background:#2196F3;
       color:#fff;
-      font-size: 18px;
-      font-weight: 900;
-      cursor: pointer;
-      user-select: none;
+      font-size:18px; font-weight:900;
+      cursor:pointer;
+      user-select:none;
       touch-action: manipulation;
     }
 
-    /* ====== RIGHT PANEL: görev/başarım/test - kendi içinde kayabilir (sayfa değil) ====== */
+    /* RIGHT PANEL (scroll yok, hepsi sığacak diye ölçekleyeceğiz) */
     .side{
-      display: grid;
-      grid-template-rows: 1fr 1fr 1.2fr;
-      gap: 14px;
-      height: 100%;
-    }
-    .scrollBox{
-      overflow: auto;               /* sadece bu alan kayar */
-      -webkit-overflow-scrolling: touch;
-      padding-right: 6px;
+      display:grid;
+      grid-template-rows: auto auto auto;
+      gap:14px;
     }
 
     .mission{
@@ -257,13 +205,12 @@
       margin-bottom: 10px;
       position: relative;
     }
-    .mission .mTitle{ font-weight: 900; color:#4CAF50; margin-bottom: 6px; }
-    .mission .mDesc{ font-size: 12px; color:#CFD8DC; margin-bottom: 8px; }
+    .mission .mTitle{ font-weight: 900; color:#4CAF50; margin-bottom:6px; }
+    .mission .mDesc{ font-size: 12px; color:#CFD8DC; margin-bottom:8px; }
     .mission .mReward{ font-size: 12px; font-weight: 900; color:#FFC107; }
     .badge{
       position:absolute; top:10px; right:10px;
-      width: 26px; height: 26px;
-      border-radius: 50%;
+      width:26px; height:26px; border-radius:50%;
       display:flex; align-items:center; justify-content:center;
       background: rgba(0,0,0,.35);
       font-size: 14px;
@@ -272,123 +219,117 @@
     .ach{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap:10px;
     }
     .achItem{
-      border-radius: 14px;
-      border: 2px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      border:2px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.05);
-      padding: 10px;
+      padding:10px;
       text-align:center;
     }
     .achItem.unlocked{
       border-color:#FFC107;
       background: rgba(255,193,7,.10);
     }
-    .achIcon{ font-size: 30px; margin-bottom: 6px; }
-    .achName{ font-size: 12px; font-weight: 900; }
+    .achIcon{ font-size: 30px; margin-bottom:6px; }
+    .achName{ font-size: 12px; font-weight:900; }
     .achDesc{ font-size: 10px; color:#B0BEC5; }
 
     .quizQ{
-      border-radius: 14px;
+      border-radius:14px;
       background: rgba(255,255,255,.06);
-      padding: 12px;
-      margin-bottom: 10px;
+      padding:12px;
+      margin-bottom:10px;
     }
-    .quizQ b{ display:block; margin-bottom: 8px; font-size: 12px; color:#E0E0E0; }
+    .quizQ b{ display:block; margin-bottom:8px; font-size:12px; color:#E0E0E0; }
     .opt{
-      border: 2px solid transparent;
-      border-radius: 12px;
-      padding: 10px;
+      border:2px solid transparent;
+      border-radius:12px;
+      padding:10px;
       background: rgba(255,255,255,.10);
-      cursor: pointer;
-      user-select: none;
+      cursor:pointer;
+      user-select:none;
       touch-action: manipulation;
-      font-size: 12px;
-      margin-bottom: 8px;
+      font-size:12px;
+      margin-bottom:8px;
     }
     .opt.selected{ border-color:#FFC107; background: rgba(255,193,7,.18); }
     .opt.correct{ border-color:#4CAF50; background: rgba(76,175,80,.18); }
     .opt.wrong{ border-color:#F44336; background: rgba(244,67,54,.18); }
 
     .primary{
-      width: 100%;
-      border: none;
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-weight: 900;
-      cursor: pointer;
+      width:100%;
+      border:none;
+      border-radius:18px;
+      padding:12px 14px;
+      font-weight:900;
+      cursor:pointer;
       color:#fff;
       background: linear-gradient(135deg,#4CAF50,#8BC34A);
-      user-select: none;
+      user-select:none;
       touch-action: manipulation;
     }
     .primary:disabled{ opacity:.5; cursor:not-allowed; }
 
     .result{
-      margin-top: 10px;
-      border-radius: 16px;
-      border: 2px solid #4CAF50;
-      padding: 12px;
+      margin-top:10px;
+      border-radius:16px;
+      border:2px solid #4CAF50;
+      padding:12px;
       text-align:center;
       background: linear-gradient(135deg, rgba(76,175,80,.18), rgba(33,150,243,.18));
+      display:none;
     }
 
-    /* ====== VR STAGE ====== */
+    /* VR OVERLAY */
     #vrStage{
-      position: fixed;
-      inset: 0;
-      background: #000;
-      z-index: 9999;
-      visibility: hidden;
-      opacity: 0;
-      pointer-events: none;
+      position:fixed;
+      inset:0;
+      background:#000;
+      z-index:9999;
+      visibility:hidden;
+      opacity:0;
+      pointer-events:none;
       transition: opacity .12s;
     }
     body.vr-on #vrStage{
-      visibility: visible;
-      opacity: 1;
-      pointer-events: auto;
+      visibility:visible;
+      opacity:1;
+      pointer-events:auto;
     }
     body.vr-on{ overflow:hidden; touch-action:none; }
 
     .vrTop{
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 10000;
-      display: flex;
-      gap: 10px;
-      align-items: center;
+      position:fixed;
+      top:10px; left:10px;
+      z-index:10000;
+      display:flex; gap:10px; align-items:center;
     }
     .vrClose{
-      border:none;
-      border-radius: 14px;
-      padding: 10px 14px;
-      font-weight: 900;
-      cursor: pointer;
+      border:none; border-radius:14px;
+      padding:10px 14px;
+      font-weight:900;
+      cursor:pointer;
       color:#fff;
       background: rgba(211,47,47,.95);
-      user-select: none;
+      user-select:none;
       touch-action: manipulation;
     }
 
     .eye{
-      position: absolute;
-      top: 0;
-      width: 50vw;
-      height: 100vh;
-      overflow: hidden;
+      position:absolute; top:0;
+      width:50vw; height:100vh;
+      overflow:hidden;
     }
     .eye.left{ left:0; }
     .eye.right{ right:0; }
-
     .eyeInner{
       transform-origin: top left;
       will-change: transform;
     }
 
-    /* ====== BEP ====== */
+    /* BEP */
     body.bep-mode{ font-size: 18px; }
   </style>
 </head>
@@ -411,7 +352,6 @@
             <div class="stat-value" id="missionsCompleted">0/8</div>
             <div class="stat-label">Görev</div>
           </div>
-
           <button class="pill bep" id="bepBtn" type="button">BEP Modu</button>
           <button class="pill vr" id="vrBtn" type="button">VR Modu</button>
         </div>
@@ -467,21 +407,19 @@
         <div class="side">
           <div class="card">
             <div class="title">🎯 Görevler</div>
-            <div class="scrollBox" id="missions"></div>
+            <div id="missions"></div>
           </div>
 
           <div class="card">
             <div class="title">🏆 Başarımlar</div>
-            <div class="scrollBox">
-              <div class="ach" id="achievements"></div>
-            </div>
+            <div class="ach" id="achievements"></div>
           </div>
 
           <div class="card">
             <div class="title">📝 Test</div>
-            <div class="scrollBox" id="quiz"></div>
+            <div id="quiz"></div>
             <button class="primary" id="checkBtn" type="button">Cevapları Kontrol Et</button>
-            <div class="result" id="result" style="display:none;">
+            <div class="result" id="result">
               <div style="font-size:26px;font-weight:900;color:#FFC107" id="resultScore"></div>
               <div style="margin-top:6px" id="resultMsg"></div>
             </div>
@@ -502,7 +440,7 @@
   </div>
 
   <script>
-    /************ 1) iOS için sağlam tap bağlama ************/
+    /************ iOS için sağlam tap ************/
     function bindTap(el, fn){
       if(!el) return;
       const fire = (e)=>{ try{ e.preventDefault?.(); }catch(_){} fn(); };
@@ -511,30 +449,50 @@
       el.addEventListener('click', (e)=>{ e.preventDefault(); fn(); }, false);
     }
 
-    /************ 2) Ekrana sığdırma: ölçüm hatası yok (baseW/baseH) ************/
-    function applyAppScale(){
-      const baseW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--baseW'));
-      const baseH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--baseH'));
+    /************ DİNAMİK “TAM SAYFA SIĞDIR” SCALE ************
+     * app'in gerçek boyutunu ölçer (width/height) ve viewport'a sığdırır.
+     ***********************************************************/
+    const fitState = { w:1200, h:800 };
+
+    function measureApp(){
+      const app = document.getElementById('app');
+
+      // ölçüm için geçici olarak scale kaldır
+      const prev = app.style.transform;
+      app.style.transform = 'none';
+
+      // gerçek boyut
+      const rect = app.getBoundingClientRect();
+      fitState.w = rect.width;
+      fitState.h = rect.height;
+
+      // geri koy (applyFit zaten tekrar basacak)
+      app.style.transform = prev;
+    }
+
+    function applyFit(){
+      const app = document.getElementById('app');
       const vw = window.innerWidth;
       const vh = window.innerHeight;
 
-      const s = Math.min(vw / baseW, vh / baseH);
-      document.getElementById('app').style.transform = `scale(${s})`;
+      // önce ölç
+      measureApp();
+
+      const s = Math.min(vw / fitState.w, vh / fitState.h);
+      app.style.transform = `scale(${s})`;
     }
 
-    /************ 3) Oyun state ************/
+    /************ GAME STATE ************/
     const gameState = {
-      score: 0,
-      level: 1,
-      completedMissions: 0,
-      activeLayers: ['topography'],
-      directionsExplored: 0,
-      layersUsed: new Set(['topography']),
-      riskPointClicked: false,
-      waterPointClicked: false,
-      roadsExplored: false,
-      quizCompleted: false,
-      bepMode: false
+      score:0, level:1, completedMissions:0,
+      activeLayers:['topography'],
+      directionsExplored:0,
+      layersUsed:new Set(['topography']),
+      riskPointClicked:false,
+      waterPointClicked:false,
+      roadsExplored:false,
+      quizCompleted:false,
+      bepMode:false
     };
 
     const missions = [
@@ -567,7 +525,6 @@
       { q:'AR avantajı nedir?', opts:['Pahalıdır','Çevre + harita birleşir','Sadece sınıfta','Tek katman'], c:1 }
     ];
 
-    /************ 4) UI helpers ************/
     function updateStats(){
       document.getElementById('score').textContent = gameState.score;
       document.getElementById('level').textContent = gameState.level;
@@ -625,32 +582,26 @@
       }).join('');
     }
 
-    /************ 5) Mission logic ************/
     function completeMission(idx){
       const m = missions[idx];
       if(m.status==='completed') return;
-      m.status = 'completed';
+      m.status='completed';
       gameState.completedMissions++;
       addScore(m.reward);
-
       if(gameState.completedMissions===1) unlockAchievement(5);
-      if(idx < missions.length-1 && missions[idx+1].status==='locked'){
-        missions[idx+1].status='active';
-      }
+      if(idx < missions.length-1 && missions[idx+1].status==='locked') missions[idx+1].status='active';
     }
 
     function checkMissions(){
       missions.forEach((m,idx)=>{
         if(m.status==='active' && m.check()) completeMission(idx);
-        if(m.status==='locked' && idx>0 && missions[idx-1].status==='completed'){
-          m.status='active';
-        }
+        if(m.status==='locked' && idx>0 && missions[idx-1].status==='completed') m.status='active';
       });
       renderMissions();
-      if(vrState.on) rebuildVR();  // VR açıkken güncelle
+      if(vrState.on) rebuildVR();
+      applyFit(); // içerik değişince tekrar sığdır
     }
 
-    /************ 6) Layer + direction + info ************/
     function toggleLayer(name){
       const layer = document.getElementById('layer-'+name);
       const btn = document.querySelector(`.btn[data-layer="${name}"]`);
@@ -667,17 +618,15 @@
         gameState.activeLayers = gameState.activeLayers.filter(x=>x!==name);
       }
 
-      if(gameState.layersUsed.size>=1) unlockAchievement(1);
+      unlockAchievement(1);
       if(name==='roads') gameState.roadsExplored = true;
-
       checkMissions();
     }
 
-    function changeDir(dir){
+    function changeDir(){
       gameState.directionsExplored++;
       if(gameState.directionsExplored>=4) unlockAchievement(2);
 
-      // küçük görsel geri bildirim
       const vp = document.getElementById('viewport');
       vp.style.filter = 'brightness(1.2)';
       setTimeout(()=>vp.style.filter='brightness(1)', 160);
@@ -692,19 +641,16 @@
       checkMissions();
     }
 
-    /************ 7) Quiz ************/
-    let selected = {}; // qIndex -> option
-    function selectOption(q, o, el){
-      // temizle
+    let selected = {};
+    function selectOption(q,o,el){
       document.querySelectorAll(`.opt[data-q="${q}"]`).forEach(x=>x.classList.remove('selected'));
       el.classList.add('selected');
-      selected[q] = o;
+      selected[q]=o;
       if(vrState.on) rebuildVR();
     }
 
     function checkQuiz(){
-      let correct = 0;
-
+      let correct=0;
       quizQuestions.forEach((qq,i)=>{
         const chosen = selected[i];
         const opts = document.querySelectorAll(`.opt[data-q="${i}"]`);
@@ -718,8 +664,8 @@
       });
 
       const pct = (correct/quizQuestions.length)*100;
-      const result = document.getElementById('result');
-      result.style.display='block';
+      const res = document.getElementById('result');
+      res.style.display='block';
       document.getElementById('resultScore').textContent = `${correct}/${quizQuestions.length}`;
 
       let msg='';
@@ -730,37 +676,42 @@
       document.getElementById('resultMsg').textContent = msg;
       document.getElementById('checkBtn').disabled = true;
 
-      gameState.quizCompleted = true;
+      gameState.quizCompleted=true;
       checkMissions();
     }
 
-    /************ 8) BEP ************/
     function toggleBEP(){
       gameState.bepMode = !gameState.bepMode;
       document.body.classList.toggle('bep-mode');
       const b = document.getElementById('bepBtn');
       b.classList.toggle('active');
       b.textContent = gameState.bepMode ? 'Normal Mod' : 'BEP Modu';
-      applyAppScale();
-      if(vrState.on) rebuildVR();
+
+      // BEP font büyütür -> yükseklik değişir -> tekrar sığdır
+      setTimeout(()=>{
+        applyFit();
+        if(vrState.on) rebuildVR();
+      }, 0);
     }
 
-    /************ 9) VR: yeniden aç/kapa %100 güvenli ************/
+    /************ VR ************/
     const vrState = { on:false };
 
     function vrEyeScale(){
-      const baseW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--baseW'));
-      const baseH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--baseH'));
+      // göz alanı: 50vw x 100vh
+      // base: fitState (app gerçek boyutu)
       const eyeW = window.innerWidth / 2;
       const eyeH = window.innerHeight;
-      return Math.min(eyeW/baseW, eyeH/baseH) * 0.98;
+      return Math.min(eyeW / fitState.w, eyeH / fitState.h) * 0.98;
     }
 
     function rebuildVR(){
       if(!vrState.on) return;
-      const s = vrEyeScale();
 
-      // Her seferinde sıfırdan kur (kapanıp tekrar açmada bug kalmaz)
+      // önce ölç (VR scale doğru olsun)
+      measureApp();
+
+      const s = vrEyeScale();
       const appHTML = document.getElementById('app').outerHTML;
 
       const L = document.getElementById('eyeL');
@@ -768,46 +719,41 @@
       L.innerHTML = appHTML;
       R.innerHTML = appHTML;
 
-      // clone içindeki app'e scale uygula
       const aL = L.querySelector('#app');
       const aR = R.querySelector('#app');
       aL.style.transform = `scale(${s})`;
       aR.style.transform = `scale(${s})`;
 
-      // clone içindeki butonlar tıklanmasın (kontrol gerçek ekranda)
       aL.style.pointerEvents = 'none';
       aR.style.pointerEvents = 'none';
     }
 
     function openVR(){
       if(vrState.on) return;
-      vrState.on = true;
+      vrState.on=true;
 
       document.body.classList.add('vr-on');
-      const stage = document.getElementById('vrStage');
-      stage.setAttribute('aria-hidden','false');
+      document.getElementById('vrStage').setAttribute('aria-hidden','false');
 
       const btn = document.getElementById('vrBtn');
       btn.classList.add('active');
-      btn.textContent = 'VR Kapat';
+      btn.textContent='VR Kapat';
 
       rebuildVR();
     }
 
     function closeVR(){
       if(!vrState.on) return;
-      vrState.on = false;
+      vrState.on=false;
 
       document.body.classList.remove('vr-on');
-      const stage = document.getElementById('vrStage');
-      stage.setAttribute('aria-hidden','true');
-
-      document.getElementById('eyeL').innerHTML = '';
-      document.getElementById('eyeR').innerHTML = '';
+      document.getElementById('vrStage').setAttribute('aria-hidden','true');
+      document.getElementById('eyeL').innerHTML='';
+      document.getElementById('eyeR').innerHTML='';
 
       const btn = document.getElementById('vrBtn');
       btn.classList.remove('active');
-      btn.textContent = 'VR Modu';
+      btn.textContent='VR Modu';
     }
 
     function toggleVR(){
@@ -815,27 +761,24 @@
       else openVR();
     }
 
-    /************ 10) Events ************/
     function wireEvents(){
-      // katman
       document.querySelectorAll('.btn[data-layer]').forEach(b=>{
         bindTap(b, ()=>toggleLayer(b.dataset.layer));
       });
-      // yön
       document.querySelectorAll('.dir button').forEach(b=>{
         bindTap(b, ()=>changeDir(b.dataset.dir));
       });
-      // info
       document.querySelectorAll('.info').forEach(p=>{
         bindTap(p, ()=>clickInfo(p.dataset.info));
       });
-      // quiz
+
       document.getElementById('quiz').addEventListener('pointerup', (e)=>{
         const el = e.target.closest('.opt');
         if(!el) return;
         e.preventDefault();
         selectOption(parseInt(el.dataset.q,10), parseInt(el.dataset.o,10), el);
       }, {passive:false});
+
       document.getElementById('quiz').addEventListener('touchend', (e)=>{
         const el = e.target.closest('.opt');
         if(!el) return;
@@ -848,26 +791,31 @@
       bindTap(document.getElementById('vrBtn'), toggleVR);
       bindTap(document.getElementById('vrClose'), closeVR);
 
-      // VR açıkken sayfanın kaymasını tamamen engelle
       document.getElementById('vrStage').addEventListener('touchmove', (e)=>e.preventDefault(), {passive:false});
     }
 
-    /************ 11) Init ************/
     function init(){
       renderMissions();
       renderAchievements();
       renderQuiz();
       updateStats();
       wireEvents();
-      applyAppScale();
+
+      // ilk yükleme: DOM otursun diye 2 frame sonra sığdır
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          applyFit();
+        });
+      });
 
       window.addEventListener('resize', ()=>{
-        applyAppScale();
+        applyFit();
         if(vrState.on) rebuildVR();
       });
+
       window.addEventListener('orientationchange', ()=>{
         setTimeout(()=>{
-          applyAppScale();
+          applyFit();
           if(vrState.on) rebuildVR();
         }, 250);
       });
