@@ -2,378 +2,357 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>HaritaGöz - AR Harita Okuryazarlığı Simülatörü</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>HaritaGöz - Mobil + VR Uyumlu</title>
 
   <style>
+    /* ====== RESET ====== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    /* ========= Tek ekrana sığsın, scroll olmasın ========= */
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      -webkit-overflow-scrolling: auto;
-      background: linear-gradient(135deg, #1a2a3a 0%, #2d4a5c 100%);
+    :root{
+      /* Tasarımın "referans" boyutu (sığdırma buna göre yapılır) */
+      --baseW: 1200;
+      --baseH: 820;
     }
 
-    body{
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #ffffff;
+    html, body{
+      width: 100%;
+      height: 100%;
+      overflow: hidden;          /* sayfa scroll yok */
+      background: linear-gradient(135deg,#1a2a3a 0%,#2d4a5c 100%);
       -webkit-tap-highlight-color: transparent;
     }
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: #fff;
+    }
 
-    /* Uygulama kökü: scale uygulanacak alan */
-    #appRoot{
+    /* ====== EKRANA SIĞDIRMA: appScale ile tüm UI tek parça küçülür ====== */
+    #screen{
       width: 100vw;
       height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+    #app{
+      width: calc(var(--baseW) * 1px);
+      height: calc(var(--baseH) * 1px);
       transform-origin: top left;
       will-change: transform;
-      overflow: hidden;
     }
 
-    /* Tıklanabilirler için iOS tap iyileştirme */
-    button, .layer-btn, .direction-btn, .quiz-option, .ar-info-point {
-      touch-action: manipulation;
-    }
-
-    .header {
-      background: rgba(0, 0, 0, 0.3);
-      padding: 16px;
+    /* ====== HEADER ====== */
+    .header{
+      height: 76px;
+      padding: 14px 18px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(0,0,0,.28);
       backdrop-filter: blur(10px);
-      border-bottom: 2px solid rgba(76, 175, 80, 0.3);
+      border-bottom: 2px solid rgba(76,175,80,.30);
     }
-
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
+    .logo{
+      font-size: 26px;
+      font-weight: 900;
       color: #4CAF50;
       display: flex;
       align-items: center;
       gap: 10px;
       white-space: nowrap;
     }
+    .stats{
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .stat-item{ text-align: center; min-width: 70px; }
+    .stat-value{ font-size: 22px; font-weight: 900; color: #FFC107; }
+    .stat-label{ font-size: 12px; color: #B0BEC5; }
 
-    .stats { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-
-    .stat-item { text-align: center; min-width: 70px; }
-    .stat-value { font-size: 20px; font-weight: bold; color: #FFC107; }
-    .stat-label { font-size: 12px; color: #B0BEC5; }
-
-    .pill {
-      color: white;
+    .pill{
       border: none;
-      padding: 10px 16px;
       border-radius: 20px;
+      padding: 10px 16px;
+      color: #fff;
+      font-weight: 800;
       cursor: pointer;
-      font-size: 14px;
-      transition: transform 0.2s;
       user-select: none;
-      -webkit-user-select: none;
+      touch-action: manipulation;
+      transition: transform .15s;
     }
-    .pill:hover { transform: scale(1.02); }
+    .pill:hover{ transform: scale(1.02); }
+    .bep{ background:#2196F3; }
+    .bep.active{ background:#FF9800; }
+    .vr{ background:#6A1B9A; }
+    .vr.active{ background:#D32F2F; }
 
-    .bep-toggle { background: #2196F3; }
-    .bep-toggle.active { background: #FF9800; }
-
-    .vr-toggle { background: #6A1B9A; }
-    .vr-toggle.active { background: #D32F2F; }
-
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 14px 12px;
-      height: calc(100vh - 74px); /* header yüksekliği */
-      overflow: hidden;           /* tek ekran */
+    /* ====== BODY LAYOUT ====== */
+    .content{
+      height: calc(var(--baseH) * 1px - 76px);
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 14px;
     }
 
-    .section {
-      background: rgba(255, 255, 255, 0.05);
+    .card{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
       border-radius: 18px;
-      padding: 18px;
-      margin-bottom: 14px;
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px;
+      overflow: hidden;
     }
-
-    .section-title {
+    .title{
       font-size: 22px;
-      margin-bottom: 12px;
+      font-weight: 900;
       color: #4CAF50;
       display: flex;
       align-items: center;
       gap: 10px;
-    }
-
-    .task-prompt {
-      background: rgba(255, 193, 7, 0.2);
-      border: 2px solid #FFC107;
-      padding: 14px;
-      border-radius: 14px;
       margin-bottom: 12px;
     }
-    .task-prompt-title { font-size: 16px; font-weight: bold; color: #FFC107; margin-bottom: 6px; }
-    .task-prompt-desc { font-size: 14px; color: #E0E0E0; }
 
-    .ar-simulator {
-      background: #1a1a1a;
+    /* ====== SIMULATOR ====== */
+    .task{
+      background: rgba(255,193,7,.18);
+      border: 2px solid #FFC107;
       border-radius: 14px;
-      padding: 14px;
-      position: relative;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .task b{ color:#FFC107; display:block; margin-bottom:6px; }
+
+    .sim{
+      background: #121212;
       border: 3px solid #4CAF50;
+      border-radius: 16px;
+      padding: 14px;
       overflow: hidden;
     }
-
-    .ar-viewport {
-      position: relative;
+    .viewport{
       width: 100%;
-      height: 300px; /* tek ekrana sığması için daha kompakt */
-      background: linear-gradient(to bottom, #87CEEB 0%, #90EE90 50%, #8B4513 100%);
-      border-radius: 10px;
+      height: 360px;
+      border-radius: 12px;
+      position: relative;
       overflow: hidden;
+      background: linear-gradient(to bottom, #87CEEB 0%, #90EE90 55%, #8B4513 100%);
     }
 
-    .map-layers {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-    }
+    .layers{ position:absolute; inset:0; pointer-events:none; }
+    .layer{ position:absolute; inset:0; transition: opacity .2s; }
+    .hidden{ opacity:0; }
 
-    .layer {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      transition: opacity 0.25s;
-    }
-    .layer.hidden { opacity: 0; pointer-events: none; }
-
-    .topography-layer {
+    .topography-layer{
       background: repeating-linear-gradient(
         45deg, transparent, transparent 10px,
-        rgba(139, 69, 19, 0.2) 10px,
-        rgba(139, 69, 19, 0.2) 20px
+        rgba(139,69,19,.22) 10px, rgba(139,69,19,.22) 20px
       );
     }
-
-    .roads-layer {
-      background: repeating-linear-gradient(
-        90deg, transparent, transparent 50px,
-        rgba(255, 255, 0, 0.6) 50px,
-        rgba(255, 255, 0, 0.6) 52px
-      ),
-      repeating-linear-gradient(
-        0deg, transparent, transparent 80px,
-        rgba(255, 255, 0, 0.6) 80px,
-        rgba(255, 255, 0, 0.6) 82px
-      );
-    }
-
-    .water-layer {
+    .roads-layer{
       background:
-        radial-gradient(circle at 30% 70%, rgba(30, 144, 255, 0.6) 0%, transparent 30%),
-        radial-gradient(circle at 70% 40%, rgba(30, 144, 255, 0.5) 0%, transparent 25%);
+        repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(255,255,0,.65) 50px, rgba(255,255,0,.65) 52px),
+        repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(255,255,0,.65) 80px, rgba(255,255,0,.65) 82px);
     }
-
-    .settlement-layer {
+    .water-layer{
       background:
-        radial-gradient(circle at 50% 30%, rgba(255, 165, 0, 0.4) 0%, transparent 20%),
-        radial-gradient(circle at 20% 60%, rgba(255, 165, 0, 0.3) 0%, transparent 15%),
-        radial-gradient(circle at 80% 70%, rgba(255, 165, 0, 0.3) 0%, transparent 15%);
+        radial-gradient(circle at 30% 70%, rgba(30,144,255,.6) 0%, transparent 30%),
+        radial-gradient(circle at 70% 40%, rgba(30,144,255,.5) 0%, transparent 25%);
     }
-
-    .risk-layer {
+    .settlement-layer{
       background:
-        radial-gradient(circle at 60% 80%, rgba(255, 0, 0, 0.5) 0%, transparent 25%),
-        radial-gradient(circle at 25% 30%, rgba(255, 0, 0, 0.4) 0%, transparent 20%);
+        radial-gradient(circle at 50% 30%, rgba(255,165,0,.42) 0%, transparent 20%),
+        radial-gradient(circle at 20% 60%, rgba(255,165,0,.32) 0%, transparent 15%),
+        radial-gradient(circle at 80% 70%, rgba(255,165,0,.32) 0%, transparent 15%);
+    }
+    .risk-layer{
+      background:
+        radial-gradient(circle at 60% 80%, rgba(255,0,0,.55) 0%, transparent 25%),
+        radial-gradient(circle at 25% 30%, rgba(255,0,0,.42) 0%, transparent 20%);
     }
 
-    .ar-info-point {
+    .info{
       position: absolute;
-      background: rgba(76, 175, 80, 0.9);
-      color: white;
-      padding: 8px 10px;
-      border-radius: 10px;
-      font-size: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      padding: 9px 12px;
+      border-radius: 12px;
+      background: rgba(76,175,80,.92);
+      font-weight: 800;
+      font-size: 13px;
       cursor: pointer;
       user-select: none;
-      -webkit-user-select: none;
+      touch-action: manipulation;
+      box-shadow: 0 6px 16px rgba(0,0,0,.35);
     }
 
-    .layer-controls {
+    .controls{
+      margin-top: 12px;
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 12px;
     }
-
-    .layer-btn {
-      padding: 10px 12px;
+    .btn{
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 900;
       cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      transition: all 0.2s;
+      user-select: none;
+      touch-action: manipulation;
+      transition: transform .12s;
       display: flex;
       align-items: center;
-      gap: 6px;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    .layer-btn.topography { background: linear-gradient(135deg, #8B4513, #D2691E); color: white; }
-    .layer-btn.roads { background: linear-gradient(135deg, #FFD700, #FFA500); color: #333; }
-    .layer-btn.water { background: linear-gradient(135deg, #1E90FF, #4169E1); color: white; }
-    .layer-btn.settlement { background: linear-gradient(135deg, #FF6347, #FF8C00); color: white; }
-    .layer-btn.risk { background: linear-gradient(135deg, #DC143C, #8B0000); color: white; }
-    .layer-btn.inactive { opacity: 0.4; filter: grayscale(100%); }
-
-    .direction-controls {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      max-width: 200px;
-      margin: 12px auto 0;
     }
+    .btn:hover{ transform: translateY(-1px); }
 
-    .direction-btn {
-      padding: 12px;
-      background: #2196F3;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-      font-size: 16px;
-      user-select: none;
-      -webkit-user-select: none;
-    }
+    .btn.topo{ background: linear-gradient(135deg,#8B4513,#D2691E); color:#fff; }
+    .btn.roads{ background: linear-gradient(135deg,#FFD700,#FFA500); color:#1c1c1c; }
+    .btn.water{ background: linear-gradient(135deg,#1E90FF,#4169E1); color:#fff; }
+    .btn.settle{ background: linear-gradient(135deg,#FF6347,#FF8C00); color:#fff; }
+    .btn.risk{ background: linear-gradient(135deg,#DC143C,#8B0000); color:#fff; }
+    .inactive{ opacity:.40; filter: grayscale(1); }
 
-    /* Tek ekrana sığması için görev/başarım/test bölümleri kompakt */
-    .grid2 {
+    .dir{
+      margin-top: 12px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 56px);
+      gap: 8px;
+      justify-content: center;
+    }
+    .dir button{
+      width: 56px;
+      height: 44px;
+      border: none;
+      border-radius: 12px;
+      background: #2196F3;
+      color:#fff;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    /* ====== RIGHT PANEL: görev/başarım/test - kendi içinde kayabilir (sayfa değil) ====== */
+    .side{
+      display: grid;
+      grid-template-rows: 1fr 1fr 1.2fr;
       gap: 14px;
       height: 100%;
     }
+    .scrollBox{
+      overflow: auto;               /* sadece bu alan kayar */
+      -webkit-overflow-scrolling: touch;
+      padding-right: 6px;
+    }
 
-    .missions, .achievements { display: grid; gap: 10px; }
-    .missions { grid-template-columns: 1fr; max-height: 190px; overflow: hidden; }
-    .achievements { grid-template-columns: repeat(2, 1fr); max-height: 190px; overflow: hidden; }
-
-    .mission-card {
-      background: linear-gradient(135deg, rgba(33, 150, 243, 0.2), rgba(76, 175, 80, 0.2));
-      padding: 12px;
+    .mission{
       border-radius: 14px;
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255,255,255,.12);
+      background: linear-gradient(135deg, rgba(33,150,243,.18), rgba(76,175,80,.18));
+      padding: 12px;
+      margin-bottom: 10px;
       position: relative;
     }
-    .mission-title { font-size: 14px; font-weight: bold; margin-bottom: 6px; color: #4CAF50; }
-    .mission-desc { font-size: 12px; color: #CFD8DC; margin-bottom: 8px; }
-    .mission-reward { font-size: 12px; color: #FFC107; font-weight: bold; }
-
-    .mission-status {
-      position: absolute;
-      top: 8px; right: 8px;
-      width: 24px; height: 24px;
+    .mission .mTitle{ font-weight: 900; color:#4CAF50; margin-bottom: 6px; }
+    .mission .mDesc{ font-size: 12px; color:#CFD8DC; margin-bottom: 8px; }
+    .mission .mReward{ font-size: 12px; font-weight: 900; color:#FFC107; }
+    .badge{
+      position:absolute; top:10px; right:10px;
+      width: 26px; height: 26px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(0,0,0,.35);
       font-size: 14px;
-      background: rgba(0,0,0,0.35);
     }
 
-    .achievement {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 12px;
+    .ach{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .achItem{
       border-radius: 14px;
-      text-align: center;
-      border: 2px solid rgba(255, 255, 255, 0.1);
-    }
-    .achievement.unlocked { border-color: #FFC107; background: rgba(255, 193, 7, 0.1); }
-    .achievement-icon { font-size: 28px; margin-bottom: 6px; filter: grayscale(100%); }
-    .achievement.unlocked .achievement-icon { filter: grayscale(0%); }
-    .achievement-name { font-size: 12px; font-weight: bold; }
-    .achievement-desc { font-size: 10px; color: #B0BEC5; }
-
-    .quiz { display: grid; gap: 10px; max-height: 220px; overflow: hidden; }
-    .quiz-question { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 14px; }
-    .quiz-question-text { font-size: 13px; margin-bottom: 10px; color: #E0E0E0; }
-    .quiz-options { display: grid; gap: 8px; }
-    .quiz-option {
+      border: 2px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
       padding: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 2px solid transparent;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 12px;
-      user-select: none;
-      -webkit-user-select: none;
+      text-align:center;
     }
-    .quiz-option.selected { border-color: #FFC107; background: rgba(255, 193, 7, 0.2); }
-    .quiz-option.correct { border-color: #4CAF50; background: rgba(76, 175, 80, 0.2); }
-    .quiz-option.wrong { border-color: #F44336; background: rgba(244, 67, 54, 0.2); }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #4CAF50, #8BC34A);
-      color: white;
-      border: none;
-      padding: 12px 18px;
-      border-radius: 22px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      user-select: none;
-      -webkit-user-select: none;
+    .achItem.unlocked{
+      border-color:#FFC107;
+      background: rgba(255,193,7,.10);
     }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .achIcon{ font-size: 30px; margin-bottom: 6px; }
+    .achName{ font-size: 12px; font-weight: 900; }
+    .achDesc{ font-size: 10px; color:#B0BEC5; }
 
-    .result-panel {
-      background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(33, 150, 243, 0.2));
-      padding: 14px;
+    .quizQ{
       border-radius: 14px;
-      text-align: center;
-      margin-top: 10px;
-      border: 2px solid #4CAF50;
+      background: rgba(255,255,255,.06);
+      padding: 12px;
+      margin-bottom: 10px;
     }
-    .result-score { font-size: 28px; font-weight: bold; color: #FFC107; margin-bottom: 6px; }
-    .result-message { font-size: 14px; color: #E0E0E0; }
+    .quizQ b{ display:block; margin-bottom: 8px; font-size: 12px; color:#E0E0E0; }
+    .opt{
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(255,255,255,.10);
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .opt.selected{ border-color:#FFC107; background: rgba(255,193,7,.18); }
+    .opt.correct{ border-color:#4CAF50; background: rgba(76,175,80,.18); }
+    .opt.wrong{ border-color:#F44336; background: rgba(244,67,54,.18); }
 
-    .hidden { display: none; }
+    .primary{
+      width: 100%;
+      border: none;
+      border-radius: 18px;
+      padding: 12px 14px;
+      font-weight: 900;
+      cursor: pointer;
+      color:#fff;
+      background: linear-gradient(135deg,#4CAF50,#8BC34A);
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .primary:disabled{ opacity:.5; cursor:not-allowed; }
 
-    /* ========= VR Overlay ========= */
-    .vr-stage{
+    .result{
+      margin-top: 10px;
+      border-radius: 16px;
+      border: 2px solid #4CAF50;
+      padding: 12px;
+      text-align:center;
+      background: linear-gradient(135deg, rgba(76,175,80,.18), rgba(33,150,243,.18));
+    }
+
+    /* ====== VR STAGE ====== */
+    #vrStage{
       position: fixed;
       inset: 0;
       background: #000;
       z-index: 9999;
-
       visibility: hidden;
       opacity: 0;
       pointer-events: none;
-      transition: opacity .15s ease;
+      transition: opacity .12s;
     }
-
-    body.vr-on .vr-stage{
+    body.vr-on #vrStage{
       visibility: visible;
       opacity: 1;
       pointer-events: auto;
     }
+    body.vr-on{ overflow:hidden; touch-action:none; }
 
-    /* VR açınca arka tarafın kaymasını kesin engelle */
-    body.vr-on, body.vr-on html{
-      overflow: hidden !important;
-      overscroll-behavior: none;
-      touch-action: none;
-    }
-
-    .vr-topbar{
+    .vrTop{
       position: fixed;
       top: 10px;
       left: 10px;
@@ -382,621 +361,516 @@
       gap: 10px;
       align-items: center;
     }
-
-    .vr-close{
-      background: rgba(211,47,47,0.95);
-      border: none;
-      color: #fff;
-      padding: 10px 14px;
+    .vrClose{
+      border:none;
       border-radius: 14px;
-      font-weight: 800;
+      padding: 10px 14px;
+      font-weight: 900;
       cursor: pointer;
+      color:#fff;
+      background: rgba(211,47,47,.95);
       user-select: none;
-      -webkit-user-select: none;
+      touch-action: manipulation;
     }
 
-    .vr-eye{
+    .eye{
       position: absolute;
       top: 0;
       width: 50vw;
       height: 100vh;
       overflow: hidden;
     }
-    .vr-eye.left{ left: 0; }
-    .vr-eye.right{ right: 0; }
+    .eye.left{ left:0; }
+    .eye.right{ right:0; }
 
-    .vr-content{
+    .eyeInner{
       transform-origin: top left;
       will-change: transform;
     }
 
-    .hud{
-      position: fixed;
-      left: 12px;
-      bottom: 12px;
-      z-index: 10001;
-      font-size: 12px;
-      background: rgba(0,0,0,0.65);
-      color: #fff;
-      padding: 8px 10px;
-      border-radius: 10px;
-      backdrop-filter: blur(6px);
-      max-width: 78vw;
-    }
-
-    .focus-ring{
-      outline: 3px solid rgba(255,193,7,0.95);
-      outline-offset: 4px;
-      border-radius: 12px;
-    }
-
-    /* BEP */
-    body.bep-mode { font-size: 18px; }
-    body.bep-mode .section-title { font-size: 26px; }
+    /* ====== BEP ====== */
+    body.bep-mode{ font-size: 18px; }
   </style>
 </head>
 
 <body>
-  <div id="appRoot">
-    <div class="header">
-      <div class="logo">🗺️ HaritaGöz</div>
+  <div id="screen">
+    <div id="app">
+      <div class="header">
+        <div class="logo">🗺️ HaritaGöz</div>
+        <div class="stats">
+          <div class="stat-item">
+            <div class="stat-value" id="score">0</div>
+            <div class="stat-label">Puan</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="level">1</div>
+            <div class="stat-label">Seviye</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="missionsCompleted">0/8</div>
+            <div class="stat-label">Görev</div>
+          </div>
 
-      <div class="stats">
-        <div class="stat-item">
-          <div class="stat-value" id="score">0</div>
-          <div class="stat-label">Puan</div>
+          <button class="pill bep" id="bepBtn" type="button">BEP Modu</button>
+          <button class="pill vr" id="vrBtn" type="button">VR Modu</button>
         </div>
-        <div class="stat-item">
-          <div class="stat-value" id="level">1</div>
-          <div class="stat-label">Seviye</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="missions-completed">0/8</div>
-          <div class="stat-label">Görev</div>
-        </div>
-
-        <button class="pill bep-toggle" id="bep-toggle" type="button">BEP Modu</button>
-        <button class="pill vr-toggle" id="vr-toggle" type="button">VR Modu</button>
       </div>
-    </div>
 
-    <div class="container">
-      <div class="section">
-        <div class="section-title">🎯 AR Harita Simülatörü</div>
+      <div class="content">
+        <!-- LEFT -->
+        <div class="card">
+          <div class="title">🎯 AR Harita Simülatörü</div>
 
-        <div class="task-prompt" id="current-task">
-          <div class="task-prompt-title">Hoş Geldiniz!</div>
-          <div class="task-prompt-desc">Katmanları açıp kapatın. Yön butonlarıyla farklı yöne bakın. VR’de de aynısı çalışır.</div>
-        </div>
+          <div class="task">
+            <b>Hoş geldin!</b>
+            Katmanları aç/kapat. Yön tuşlarıyla farklı yöne bak. VR’de de aynı şekilde çalışır.
+          </div>
 
-        <div class="ar-simulator">
-          <div class="ar-viewport" id="ar-viewport">
-            <div class="map-layers">
-              <div class="layer topography-layer" id="layer-topography"></div>
-              <div class="layer roads-layer hidden" id="layer-roads"></div>
-              <div class="layer water-layer hidden" id="layer-water"></div>
-              <div class="layer settlement-layer hidden" id="layer-settlement"></div>
-              <div class="layer risk-layer hidden" id="layer-risk"></div>
+          <div class="sim">
+            <div class="viewport" id="viewport">
+              <div class="layers">
+                <div class="layer topography-layer" id="layer-topography"></div>
+                <div class="layer roads-layer hidden" id="layer-roads"></div>
+                <div class="layer water-layer hidden" id="layer-water"></div>
+                <div class="layer settlement-layer hidden" id="layer-settlement"></div>
+                <div class="layer risk-layer hidden" id="layer-risk"></div>
+              </div>
+
+              <div class="info" style="top:26%; left:26%" data-info="topography">📊 Topografya</div>
+              <div class="info" style="top:70%; left:58%" data-info="risk">⚠️ Risk</div>
+              <div class="info" style="top:40%; left:70%" data-info="water">💧 Su</div>
             </div>
 
-            <div class="ar-info-point" style="top: 26%; left: 26%;" data-info="topography">📊 Topografya</div>
-            <div class="ar-info-point" style="top: 70%; left: 58%;" data-info="risk">⚠️ Risk</div>
-            <div class="ar-info-point" style="top: 40%; left: 70%;" data-info="water">💧 Su</div>
-          </div>
+            <div class="controls">
+              <button class="btn topo" data-layer="topography" type="button">🏔️ Topografya</button>
+              <button class="btn roads inactive" data-layer="roads" type="button">🛣️ Ulaşım</button>
+              <button class="btn water inactive" data-layer="water" type="button">💧 Su</button>
+              <button class="btn settle inactive" data-layer="settlement" type="button">🏘️ Yerleşim</button>
+              <button class="btn risk inactive" data-layer="risk" type="button">⚠️ Risk</button>
+            </div>
 
-          <div class="layer-controls">
-            <button class="layer-btn topography" data-layer="topography" type="button">🏔️ Topografya</button>
-            <button class="layer-btn roads inactive" data-layer="roads" type="button">🛣️ Ulaşım</button>
-            <button class="layer-btn water inactive" data-layer="water" type="button">💧 Su</button>
-            <button class="layer-btn settlement inactive" data-layer="settlement" type="button">🏘️ Yerleşim</button>
-            <button class="layer-btn risk inactive" data-layer="risk" type="button">⚠️ Risk</button>
-          </div>
-
-          <div class="direction-controls">
-            <button class="direction-btn" data-direction="nw" type="button">↖️</button>
-            <button class="direction-btn" data-direction="n" type="button">⬆️</button>
-            <button class="direction-btn" data-direction="ne" type="button">↗️</button>
-            <button class="direction-btn" data-direction="w" type="button">⬅️</button>
-            <button class="direction-btn" data-direction="e" type="button">➡️</button>
-            <button class="direction-btn" data-direction="sw" type="button">↙️</button>
-            <button class="direction-btn" data-direction="s" type="button">⬇️</button>
-            <button class="direction-btn" data-direction="se" type="button">↘️</button>
+            <div class="dir">
+              <button data-dir="nw" type="button">↖️</button>
+              <button data-dir="n"  type="button">⬆️</button>
+              <button data-dir="ne" type="button">↗️</button>
+              <button data-dir="w"  type="button">⬅️</button>
+              <button data-dir="e"  type="button">➡️</button>
+              <button data-dir="sw" type="button">↙️</button>
+              <button data-dir="s"  type="button">⬇️</button>
+              <button data-dir="se" type="button">↘️</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="grid2">
-        <div class="section">
-          <div class="section-title">🎯 Görevler</div>
-          <div class="missions" id="missions"></div>
+        <!-- RIGHT -->
+        <div class="side">
+          <div class="card">
+            <div class="title">🎯 Görevler</div>
+            <div class="scrollBox" id="missions"></div>
+          </div>
+
+          <div class="card">
+            <div class="title">🏆 Başarımlar</div>
+            <div class="scrollBox">
+              <div class="ach" id="achievements"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="title">📝 Test</div>
+            <div class="scrollBox" id="quiz"></div>
+            <button class="primary" id="checkBtn" type="button">Cevapları Kontrol Et</button>
+            <div class="result" id="result" style="display:none;">
+              <div style="font-size:26px;font-weight:900;color:#FFC107" id="resultScore"></div>
+              <div style="margin-top:6px" id="resultMsg"></div>
+            </div>
+          </div>
         </div>
 
-        <div class="section">
-          <div class="section-title">🏆 Başarımlar</div>
-          <div class="achievements" id="achievements"></div>
-        </div>
-      </div>
-
-      <div class="section" id="quiz-section">
-        <div class="section-title">📝 Test</div>
-        <div class="quiz" id="quiz"></div>
-        <button class="btn-primary" id="check-answers" type="button">Cevapları Kontrol Et</button>
-
-        <div class="result-panel hidden" id="quiz-result">
-          <div class="result-score" id="quiz-score"></div>
-          <div class="result-message" id="quiz-message"></div>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- VR Overlay -->
-  <div class="vr-stage" id="vr-stage" aria-hidden="true">
-    <div class="vr-topbar">
-      <button class="vr-close" id="vr-close" type="button">✕ Kapat</button>
+  <!-- VR overlay -->
+  <div id="vrStage" aria-hidden="true">
+    <div class="vrTop">
+      <button class="vrClose" id="vrClose" type="button">✕ Kapat</button>
     </div>
-
-    <div class="vr-eye left"><div class="vr-content" id="vr-left"></div></div>
-    <div class="vr-eye right"><div class="vr-content" id="vr-right"></div></div>
+    <div class="eye left"><div class="eyeInner" id="eyeL"></div></div>
+    <div class="eye right"><div class="eyeInner" id="eyeR"></div></div>
   </div>
-
-  <div class="hud hidden" id="hud">Hazır</div>
 
   <script>
-    // ========= Tap bağlama: iOS'ta "kesin tık" =========
-    function bindTap(el, handler){
-      if (!el) return;
-      const fire = (e) => {
-        try { e.preventDefault?.(); } catch(_){}
-        handler();
-      };
+    /************ 1) iOS için sağlam tap bağlama ************/
+    function bindTap(el, fn){
+      if(!el) return;
+      const fire = (e)=>{ try{ e.preventDefault?.(); }catch(_){} fn(); };
       el.addEventListener('pointerup', fire, {passive:false});
       el.addEventListener('touchend', fire, {passive:false});
-      el.addEventListener('click', (e)=>{ e.preventDefault(); handler(); }, false);
+      el.addEventListener('click', (e)=>{ e.preventDefault(); fn(); }, false);
     }
 
-    function showHUD(msg, ms = 1400){
-      const hud = document.getElementById('hud');
-      hud.textContent = msg;
-      hud.classList.remove('hidden');
-      clearTimeout(showHUD._t);
-      showHUD._t = setTimeout(()=>hud.classList.add('hidden'), ms);
+    /************ 2) Ekrana sığdırma: ölçüm hatası yok (baseW/baseH) ************/
+    function applyAppScale(){
+      const baseW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--baseW'));
+      const baseH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--baseH'));
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      const s = Math.min(vw / baseW, vh / baseH);
+      document.getElementById('app').style.transform = `scale(${s})`;
     }
 
-    // ========= Game State =========
+    /************ 3) Oyun state ************/
     const gameState = {
       score: 0,
       level: 1,
       completedMissions: 0,
       activeLayers: ['topography'],
-      currentDirection: 'n',
+      directionsExplored: 0,
+      layersUsed: new Set(['topography']),
+      riskPointClicked: false,
+      waterPointClicked: false,
+      roadsExplored: false,
+      quizCompleted: false,
       bepMode: false
     };
-    gameState.directionsExplored = 0;
-    gameState.layersUsed = new Set();
-    gameState.riskPointClicked = false;
-    gameState.waterPointClicked = false;
-    gameState.roadsExplored = false;
-    gameState.quizCompleted = false;
 
     const missions = [
-      { id: 1, title: 'Katmanları Keşfet', desc: 'En az 3 katmanı aç', reward: 50, status: 'active', check: () => gameState.activeLayers.length >= 3 },
-      { id: 2, title: 'Yön Bul', desc: '4 farklı yöne bak', reward: 75, status: 'locked', check: () => gameState.directionsExplored >= 4 },
-      { id: 3, title: 'Risk Analizi', desc: 'Risk katmanını aç + risk noktasına dokun', reward: 100, status: 'locked', check: () => gameState.activeLayers.includes('risk') && gameState.riskPointClicked },
-      { id: 4, title: 'Su Kaynakları', desc: 'Su katmanı + su noktasına dokun', reward: 100, status: 'locked', check: () => gameState.activeLayers.includes('water') && gameState.waterPointClicked },
-      { id: 5, title: 'Güzergah', desc: 'Ulaşım katmanını keşfet', reward: 150, status: 'locked', check: () => gameState.activeLayers.includes('roads') && gameState.roadsExplored },
-      { id: 6, title: 'Yerleşim', desc: 'Yerleşim katmanını aç', reward: 150, status: 'locked', check: () => gameState.activeLayers.includes('settlement') },
-      { id: 7, title: 'Harita Uzmanı', desc: 'Testi tamamla', reward: 200, status: 'locked', check: () => gameState.quizCompleted },
-      { id: 8, title: 'AR Ustası', desc: '1000 puana ulaş', reward: 300, status: 'locked', check: () => gameState.completedMissions >= 7 && gameState.score >= 1000 }
+      { id:1, title:'Katmanları Keşfet', desc:'En az 3 katmanı aç', reward:50, status:'active', check:()=>gameState.activeLayers.length>=3 },
+      { id:2, title:'Yön Bul', desc:'4 farklı yöne bak', reward:75, status:'locked', check:()=>gameState.directionsExplored>=4 },
+      { id:3, title:'Risk Analizi', desc:'Risk katmanı + risk noktasına dokun', reward:100, status:'locked', check:()=>gameState.activeLayers.includes('risk') && gameState.riskPointClicked },
+      { id:4, title:'Su Kaynakları', desc:'Su katmanı + su noktasına dokun', reward:100, status:'locked', check:()=>gameState.activeLayers.includes('water') && gameState.waterPointClicked },
+      { id:5, title:'Güzergah', desc:'Ulaşım katmanını keşfet', reward:150, status:'locked', check:()=>gameState.activeLayers.includes('roads') && gameState.roadsExplored },
+      { id:6, title:'Yerleşim', desc:'Yerleşim katmanını aç', reward:150, status:'locked', check:()=>gameState.activeLayers.includes('settlement') },
+      { id:7, title:'Harita Uzmanı', desc:'Testi tamamla', reward:200, status:'locked', check:()=>gameState.quizCompleted },
+      { id:8, title:'AR Ustası', desc:'1000 puana ulaş', reward:300, status:'locked', check:()=>gameState.completedMissions>=7 && gameState.score>=1000 }
     ];
 
     const achievements = [
-      { id: 1, icon: '🗺️', name: 'İlk Keşif', desc: 'İlk katmanı açtın', unlocked: false },
-      { id: 2, icon: '🧭', name: 'Yön Bulma', desc: '4 yöne baktın', unlocked: false },
-      { id: 3, icon: '⚠️', name: 'Risk', desc: 'Risk noktasını buldun', unlocked: false },
-      { id: 4, icon: '💧', name: 'Su', desc: 'Su noktasını buldun', unlocked: false },
-      { id: 5, icon: '🏆', name: 'İlk Görev', desc: 'İlk görevi tamamladın', unlocked: false },
-      { id: 6, icon: '📚', name: '500', desc: '500 puan', unlocked: false },
-      { id: 7, icon: '🎓', name: 'Test', desc: 'Testi geçtin', unlocked: false },
-      { id: 8, icon: '👑', name: 'Usta', desc: 'Tüm görevler', unlocked: false }
+      { id:1, icon:'🗺️', name:'İlk Keşif', desc:'Bir katman açtın', unlocked:false },
+      { id:2, icon:'🧭', name:'Yön Bulma', desc:'4 yöne baktın', unlocked:false },
+      { id:3, icon:'⚠️', name:'Risk', desc:'Risk noktasını buldun', unlocked:false },
+      { id:4, icon:'💧', name:'Su', desc:'Su noktasını buldun', unlocked:false },
+      { id:5, icon:'🏆', name:'İlk Görev', desc:'İlk görevi bitirdin', unlocked:false },
+      { id:6, icon:'📚', name:'500', desc:'500 puana ulaştın', unlocked:false },
+      { id:7, icon:'🎓', name:'Test', desc:'Testi geçtin', unlocked:false },
+      { id:8, icon:'👑', name:'Usta', desc:'Hepsi tamam', unlocked:false }
     ];
 
     const quizQuestions = [
-      { question: 'Yüksekliği gösteren katman?', options: ['Topografya', 'Ulaşım', 'Yerleşim', 'Risk'], correct: 0 },
-      { question: 'Sel riski için birlikte?', options: ['Sadece risk', 'Su + topografya', 'Sadece yerleşim', 'Sadece ulaşım'], correct: 1 },
-      { question: 'Nüfus yoğunluğu?', options: ['Topografya', 'Su', 'Yerleşim', 'Ulaşım'], correct: 2 },
-      { question: 'Güvenli güzergah?', options: ['Ulaşım + risk', 'Sadece topo', 'Sadece su', 'Sadece yerleşim'], correct: 0 },
-      { question: 'AR avantajı?', options: ['Pahalıdır', 'Çevre + harita birleşir', 'Sadece sınıfta', 'Tek katman'], correct: 1 }
+      { q:'Yüksekliği gösteren katman hangisi?', opts:['Topografya','Ulaşım','Yerleşim','Risk'], c:0 },
+      { q:'Sel riski için birlikte hangi katmanlar?', opts:['Sadece risk','Su + topografya','Sadece yerleşim','Sadece ulaşım'], c:1 },
+      { q:'Nüfus yoğunluğu için?', opts:['Topografya','Su','Yerleşim','Ulaşım'], c:2 },
+      { q:'Güvenli güzergah için önemli?', opts:['Ulaşım + risk','Sadece topo','Sadece su','Sadece yerleşim'], c:0 },
+      { q:'AR avantajı nedir?', opts:['Pahalıdır','Çevre + harita birleşir','Sadece sınıfta','Tek katman'], c:1 }
     ];
 
-    // ========= Render =========
+    /************ 4) UI helpers ************/
+    function updateStats(){
+      document.getElementById('score').textContent = gameState.score;
+      document.getElementById('level').textContent = gameState.level;
+      document.getElementById('missionsCompleted').textContent = `${gameState.completedMissions}/${missions.length}`;
+    }
+
+    function addScore(p){
+      gameState.score += p;
+      if(gameState.score >= 500) unlockAchievement(6);
+      const newLevel = Math.floor(gameState.score / 200) + 1;
+      gameState.level = Math.max(gameState.level, newLevel);
+      updateStats();
+    }
+
+    function unlockAchievement(id){
+      const a = achievements.find(x=>x.id===id);
+      if(!a || a.unlocked) return;
+      a.unlocked = true;
+      renderAchievements();
+      addScore(50);
+    }
+
     function renderMissions(){
-      const container = document.getElementById('missions');
-      container.innerHTML = missions.map(m => `
-        <div class="mission-card ${m.status}">
-          <div class="mission-status">${m.status === 'locked' ? '🔒' : m.status === 'active' ? '⚡' : '✅'}</div>
-          <div class="mission-title">${m.title}</div>
-          <div class="mission-desc">${m.desc}</div>
-          <div class="mission-reward">+${m.reward} Puan</div>
-        </div>
-      `).join('');
-      updateMissionCounter();
+      const box = document.getElementById('missions');
+      box.innerHTML = missions.map(m=>{
+        const icon = (m.status==='locked')?'🔒':(m.status==='active')?'⚡':'✅';
+        return `
+          <div class="mission">
+            <div class="badge">${icon}</div>
+            <div class="mTitle">${m.title}</div>
+            <div class="mDesc">${m.desc}</div>
+            <div class="mReward">+${m.reward} puan</div>
+          </div>
+        `;
+      }).join('');
+      updateStats();
     }
 
     function renderAchievements(){
-      const container = document.getElementById('achievements');
-      container.innerHTML = achievements.map(a => `
-        <div class="achievement ${a.unlocked ? 'unlocked' : ''}">
-          <div class="achievement-icon">${a.icon}</div>
-          <div class="achievement-name">${a.name}</div>
-          <div class="achievement-desc">${a.desc}</div>
+      const box = document.getElementById('achievements');
+      box.innerHTML = achievements.map(a=>`
+        <div class="achItem ${a.unlocked?'unlocked':''}">
+          <div class="achIcon">${a.icon}</div>
+          <div class="achName">${a.name}</div>
+          <div class="achDesc">${a.desc}</div>
         </div>
       `).join('');
     }
 
     function renderQuiz(){
-      const container = document.getElementById('quiz');
-      container.innerHTML = quizQuestions.map((q,i)=>`
-        <div class="quiz-question" data-question="${i}">
-          <div class="quiz-question-text">${i+1}. ${q.question}</div>
-          <div class="quiz-options">
-            ${q.options.map((opt,j)=>`
-              <div class="quiz-option" data-question="${i}" data-option="${j}">${opt}</div>
-            `).join('')}
-          </div>
-        </div>
-      `).join('');
+      const box = document.getElementById('quiz');
+      box.innerHTML = quizQuestions.map((qq,i)=>{
+        const opts = qq.opts.map((t,j)=>`<div class="opt" data-q="${i}" data-o="${j}">${t}</div>`).join('');
+        return `<div class="quizQ"><b>${i+1}. ${qq.q}</b>${opts}</div>`;
+      }).join('');
     }
 
-    // ========= Stats / Score =========
-    function updateStats(){
-      document.getElementById('score').textContent = gameState.score;
-      document.getElementById('level').textContent = gameState.level;
-    }
-    function updateMissionCounter(){
-      document.getElementById('missions-completed').textContent = `${gameState.completedMissions}/${missions.length}`;
-    }
+    /************ 5) Mission logic ************/
+    function completeMission(idx){
+      const m = missions[idx];
+      if(m.status==='completed') return;
+      m.status = 'completed';
+      gameState.completedMissions++;
+      addScore(m.reward);
 
-    function addScore(points){
-      gameState.score += points;
-      if (gameState.score >= 500 && !achievements[5].unlocked) unlockAchievement(6);
-
-      const newLevel = Math.floor(gameState.score / 200) + 1;
-      if (newLevel > gameState.level) gameState.level = newLevel;
-
-      updateStats();
-    }
-
-    function unlockAchievement(id){
-      const a = achievements.find(x => x.id === id);
-      if (a && !a.unlocked){
-        a.unlocked = true;
-        renderAchievements();
-        addScore(50);
+      if(gameState.completedMissions===1) unlockAchievement(5);
+      if(idx < missions.length-1 && missions[idx+1].status==='locked'){
+        missions[idx+1].status='active';
       }
-    }
-
-    // ========= Interactions =========
-    function toggleLayer(layerName){
-      const layer = document.getElementById(`layer-${layerName}`);
-      const btn = document.querySelector(`.layer-btn[data-layer="${layerName}"]`);
-
-      if (layer.classList.contains('hidden')){
-        layer.classList.remove('hidden');
-        btn.classList.remove('inactive');
-        if (!gameState.activeLayers.includes(layerName)) gameState.activeLayers.push(layerName);
-        gameState.layersUsed.add(layerName);
-      } else {
-        layer.classList.add('hidden');
-        btn.classList.add('inactive');
-        gameState.activeLayers = gameState.activeLayers.filter(l => l !== layerName);
-      }
-
-      if (gameState.layersUsed.size === 1 && !achievements[0].unlocked) unlockAchievement(1);
-      if (layerName === 'roads') gameState.roadsExplored = true;
-
-      checkMissions();
-      refreshVRStereo();
-    }
-
-    function changeDirection(direction){
-      gameState.currentDirection = direction;
-      gameState.directionsExplored++;
-
-      const viewport = document.getElementById('ar-viewport');
-      viewport.style.filter = 'brightness(1.2)';
-      setTimeout(()=>viewport.style.filter='brightness(1)', 180);
-
-      if (gameState.directionsExplored >= 4 && !achievements[1].unlocked) unlockAchievement(2);
-
-      checkMissions();
-      refreshVRStereo();
-    }
-
-    function clickInfoPoint(type){
-      if (type === 'risk'){
-        gameState.riskPointClicked = true;
-        if (!achievements[2].unlocked) unlockAchievement(3);
-      }
-      if (type === 'water'){
-        gameState.waterPointClicked = true;
-        if (!achievements[3].unlocked) unlockAchievement(4);
-      }
-
-      addScore(25);
-      checkMissions();
-      refreshVRStereo();
     }
 
     function checkMissions(){
-      missions.forEach((m, idx) => {
-        if (m.status === 'active' && m.check()) completeMission(idx);
-        else if (m.status === 'locked' && idx > 0) {
-          if (missions[idx - 1].status === 'completed') m.status = 'active';
+      missions.forEach((m,idx)=>{
+        if(m.status==='active' && m.check()) completeMission(idx);
+        if(m.status==='locked' && idx>0 && missions[idx-1].status==='completed'){
+          m.status='active';
         }
       });
       renderMissions();
-      refreshVRStereo();
+      if(vrState.on) rebuildVR();  // VR açıkken güncelle
     }
 
-    function completeMission(index){
-      const m = missions[index];
-      if (m.status !== 'completed'){
-        m.status = 'completed';
-        gameState.completedMissions++;
-        addScore(m.reward);
+    /************ 6) Layer + direction + info ************/
+    function toggleLayer(name){
+      const layer = document.getElementById('layer-'+name);
+      const btn = document.querySelector(`.btn[data-layer="${name}"]`);
+      const isHidden = layer.classList.contains('hidden');
 
-        if (gameState.completedMissions === 1 && !achievements[4].unlocked) unlockAchievement(5);
-        if (index < missions.length - 1) missions[index + 1].status = 'active';
-
-        renderMissions();
+      if(isHidden){
+        layer.classList.remove('hidden');
+        btn.classList.remove('inactive');
+        if(!gameState.activeLayers.includes(name)) gameState.activeLayers.push(name);
+        gameState.layersUsed.add(name);
+      }else{
+        layer.classList.add('hidden');
+        btn.classList.add('inactive');
+        gameState.activeLayers = gameState.activeLayers.filter(x=>x!==name);
       }
+
+      if(gameState.layersUsed.size>=1) unlockAchievement(1);
+      if(name==='roads') gameState.roadsExplored = true;
+
+      checkMissions();
     }
 
-    function selectQuizOption(opt){
-      const qId = opt.dataset.question;
-      document.querySelectorAll(`.quiz-option[data-question="${qId}"]`).forEach(o => o.classList.remove('selected'));
-      opt.classList.add('selected');
-      refreshVRStereo();
+    function changeDir(dir){
+      gameState.directionsExplored++;
+      if(gameState.directionsExplored>=4) unlockAchievement(2);
+
+      // küçük görsel geri bildirim
+      const vp = document.getElementById('viewport');
+      vp.style.filter = 'brightness(1.2)';
+      setTimeout(()=>vp.style.filter='brightness(1)', 160);
+
+      checkMissions();
     }
 
-    function checkQuizAnswers(){
-      let correctCount = 0;
+    function clickInfo(type){
+      if(type==='risk'){ gameState.riskPointClicked=true; unlockAchievement(3); }
+      if(type==='water'){ gameState.waterPointClicked=true; unlockAchievement(4); }
+      addScore(25);
+      checkMissions();
+    }
 
-      quizQuestions.forEach((q,i)=>{
-        const selected = document.querySelector(`.quiz-option[data-question="${i}"].selected`);
-        const all = document.querySelectorAll(`.quiz-option[data-question="${i}"]`);
-        if (!selected) return;
+    /************ 7) Quiz ************/
+    let selected = {}; // qIndex -> option
+    function selectOption(q, o, el){
+      // temizle
+      document.querySelectorAll(`.opt[data-q="${q}"]`).forEach(x=>x.classList.remove('selected'));
+      el.classList.add('selected');
+      selected[q] = o;
+      if(vrState.on) rebuildVR();
+    }
 
-        const chosen = parseInt(selected.dataset.option,10);
-        all.forEach(o=>{
-          const idx = parseInt(o.dataset.option,10);
-          if (idx === q.correct) o.classList.add('correct');
-          else if (o.classList.contains('selected')) o.classList.add('wrong');
+    function checkQuiz(){
+      let correct = 0;
+
+      quizQuestions.forEach((qq,i)=>{
+        const chosen = selected[i];
+        const opts = document.querySelectorAll(`.opt[data-q="${i}"]`);
+        opts.forEach(el=>{
+          const oi = parseInt(el.dataset.o,10);
+          el.classList.remove('correct','wrong');
+          if(oi===qq.c) el.classList.add('correct');
+          if(chosen===oi && chosen!==qq.c) el.classList.add('wrong');
         });
-        if (chosen === q.correct) correctCount++;
+        if(chosen===qq.c) correct++;
       });
 
-      const resultPanel = document.getElementById('quiz-result');
-      const scoreEl = document.getElementById('quiz-score');
-      const msgEl = document.getElementById('quiz-message');
+      const pct = (correct/quizQuestions.length)*100;
+      const result = document.getElementById('result');
+      result.style.display='block';
+      document.getElementById('resultScore').textContent = `${correct}/${quizQuestions.length}`;
 
-      scoreEl.textContent = `${correctCount}/${quizQuestions.length}`;
-      const pct = (correctCount / quizQuestions.length) * 100;
+      let msg='';
+      if(pct>=80){ msg='Mükemmel! 🏆'; addScore(200); unlockAchievement(7); }
+      else if(pct>=60){ msg='İyi! 👍'; addScore(150); }
+      else { msg='Daha fazla pratik! 💪'; addScore(100); }
 
-      if (pct >= 80){
-        msgEl.textContent = 'Mükemmel! 🏆';
-        addScore(200);
-        if (!achievements[6].unlocked) unlockAchievement(7);
-      } else if (pct >= 60){
-        msgEl.textContent = 'İyi! 👍';
-        addScore(150);
-      } else {
-        msgEl.textContent = 'Daha fazla pratik! 💪';
-        addScore(100);
-      }
-
-      resultPanel.classList.remove('hidden');
-      document.getElementById('check-answers').disabled = true;
+      document.getElementById('resultMsg').textContent = msg;
+      document.getElementById('checkBtn').disabled = true;
 
       gameState.quizCompleted = true;
       checkMissions();
-      refreshVRStereo();
     }
 
-    function toggleBEPMode(){
+    /************ 8) BEP ************/
+    function toggleBEP(){
       gameState.bepMode = !gameState.bepMode;
       document.body.classList.toggle('bep-mode');
-      const btn = document.getElementById('bep-toggle');
-      btn.classList.toggle('active');
-      btn.textContent = gameState.bepMode ? 'Normal Mod' : 'BEP Modu';
-      refreshVRStereo();
-      fitAppToScreen();
+      const b = document.getElementById('bepBtn');
+      b.classList.toggle('active');
+      b.textContent = gameState.bepMode ? 'Normal Mod' : 'BEP Modu';
+      applyAppScale();
+      if(vrState.on) rebuildVR();
     }
 
-    // ========= Fit-to-screen (Normal mod) =========
-    function fitAppToScreen(){
-      const app = document.getElementById('appRoot');
-      if (!app) return;
+    /************ 9) VR: yeniden aç/kapa %100 güvenli ************/
+    const vrState = { on:false };
 
-      // ölçüm için önce scale sıfırla
-      app.style.transform = 'scale(1)';
-
-      requestAnimationFrame(() => {
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-
-        const rect = app.getBoundingClientRect();
-        const contentW = rect.width;
-        const contentH = rect.height;
-
-        const scale = Math.min(vw / contentW, vh / contentH);
-        const finalScale = Math.min(1, scale); // büyütme yok, sadece sığdır
-
-        app.style.transform = `scale(${finalScale})`;
-      });
-    }
-
-    // ========= VR =========
-    const vrState = { enabled:false };
-
-    function calcVrScale(){
-      // Her göz 50vw x 100vh, içerik 100vw x 100vh gibi çiziliyor.
+    function vrEyeScale(){
+      const baseW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--baseW'));
+      const baseH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--baseH'));
       const eyeW = window.innerWidth / 2;
       const eyeH = window.innerHeight;
-
-      const contentW = window.innerWidth;
-      const contentH = window.innerHeight;
-
-      const sW = eyeW / contentW;
-      const sH = eyeH / contentH;
-
-      return Math.min(sW, sH) * 0.98;
+      return Math.min(eyeW/baseW, eyeH/baseH) * 0.98;
     }
 
-    function buildVRStereo(){
-      const left = document.getElementById('vr-left');
-      const right = document.getElementById('vr-right');
-      left.innerHTML = '';
-      right.innerHTML = '';
+    function rebuildVR(){
+      if(!vrState.on) return;
+      const s = vrEyeScale();
 
-      const headerClone = document.querySelector('.header').cloneNode(true);
-      const containerClone = document.querySelector('.container').cloneNode(true);
+      // Her seferinde sıfırdan kur (kapanıp tekrar açmada bug kalmaz)
+      const appHTML = document.getElementById('app').outerHTML;
 
-      // klon tıklanmasın (kontrol gerçek sayfada)
-      headerClone.style.pointerEvents = 'none';
-      containerClone.style.pointerEvents = 'none';
+      const L = document.getElementById('eyeL');
+      const R = document.getElementById('eyeR');
+      L.innerHTML = appHTML;
+      R.innerHTML = appHTML;
 
-      const wrap = document.createElement('div');
-      wrap.className = 'vr-content';
-      wrap.style.width = '100vw';
-      wrap.style.height = '100vh';
-      wrap.appendChild(headerClone);
-      wrap.appendChild(containerClone);
+      // clone içindeki app'e scale uygula
+      const aL = L.querySelector('#app');
+      const aR = R.querySelector('#app');
+      aL.style.transform = `scale(${s})`;
+      aR.style.transform = `scale(${s})`;
 
-      const wrap2 = wrap.cloneNode(true);
-
-      const s = calcVrScale();
-      wrap.style.transform = `scale(${s})`;
-      wrap2.style.transform = `scale(${s})`;
-
-      left.appendChild(wrap);
-      right.appendChild(wrap2);
-    }
-
-    function teardownVRStereo(){
-      document.getElementById('vr-left').innerHTML = '';
-      document.getElementById('vr-right').innerHTML = '';
-    }
-
-    function refreshVRStereo(){
-      if (!vrState.enabled) return;
-      buildVRStereo();
+      // clone içindeki butonlar tıklanmasın (kontrol gerçek ekranda)
+      aL.style.pointerEvents = 'none';
+      aR.style.pointerEvents = 'none';
     }
 
     function openVR(){
-      vrState.enabled = true;
+      if(vrState.on) return;
+      vrState.on = true;
+
       document.body.classList.add('vr-on');
+      const stage = document.getElementById('vrStage');
+      stage.setAttribute('aria-hidden','false');
 
-      const stage = document.getElementById('vr-stage');
-      stage.setAttribute('aria-hidden', 'false');
+      const btn = document.getElementById('vrBtn');
+      btn.classList.add('active');
+      btn.textContent = 'VR Kapat';
 
-      const vrBtn = document.getElementById('vr-toggle');
-      vrBtn.classList.add('active');
-      vrBtn.textContent = 'VR Kapat';
-
-      // arka ekranı kesin kilitle
-      document.documentElement.style.overflow = 'hidden';
-      document.body.style.overflow = 'hidden';
-
-      // VR stereo çiz
-      setTimeout(() => {
-        buildVRStereo();
-        showHUD('VR Açık | Kapat: üstte ✕ veya VR Kapat', 2000);
-      }, 60);
+      rebuildVR();
     }
 
     function closeVR(){
-      vrState.enabled = false;
+      if(!vrState.on) return;
+      vrState.on = false;
+
       document.body.classList.remove('vr-on');
+      const stage = document.getElementById('vrStage');
+      stage.setAttribute('aria-hidden','true');
 
-      const stage = document.getElementById('vr-stage');
-      stage.setAttribute('aria-hidden', 'true');
+      document.getElementById('eyeL').innerHTML = '';
+      document.getElementById('eyeR').innerHTML = '';
 
-      const vrBtn = document.getElementById('vr-toggle');
-      vrBtn.classList.remove('active');
-      vrBtn.textContent = 'VR Modu';
-
-      teardownVRStereo();
-      showHUD('VR Kapalı', 900);
-
-      // normal ekran tekrar sığsın
-      setTimeout(() => fitAppToScreen(), 60);
+      const btn = document.getElementById('vrBtn');
+      btn.classList.remove('active');
+      btn.textContent = 'VR Modu';
     }
 
-    function toggleVRMode(){
-      try{
-        if (vrState.enabled) closeVR();
-        else openVR();
-      }catch(e){
-        alert('VR hata: ' + (e?.message || e));
-      }
+    function toggleVR(){
+      if(vrState.on) closeVR();
+      else openVR();
     }
 
-    // ========= Event listeners =========
-    function setupEventListeners(){
-      // layer buttons
-      document.querySelectorAll('.layer-btn').forEach(btn => {
-        bindTap(btn, ()=>toggleLayer(btn.dataset.layer));
+    /************ 10) Events ************/
+    function wireEvents(){
+      // katman
+      document.querySelectorAll('.btn[data-layer]').forEach(b=>{
+        bindTap(b, ()=>toggleLayer(b.dataset.layer));
       });
-
-      // direction buttons
-      document.querySelectorAll('.direction-btn').forEach(btn => {
-        bindTap(btn, ()=>changeDirection(btn.dataset.direction));
+      // yön
+      document.querySelectorAll('.dir button').forEach(b=>{
+        bindTap(b, ()=>changeDir(b.dataset.dir));
       });
-
-      // info points
-      document.querySelectorAll('.ar-info-point').forEach(p => {
-        bindTap(p, ()=>clickInfoPoint(p.dataset.info));
+      // info
+      document.querySelectorAll('.info').forEach(p=>{
+        bindTap(p, ()=>clickInfo(p.dataset.info));
       });
+      // quiz
+      document.getElementById('quiz').addEventListener('pointerup', (e)=>{
+        const el = e.target.closest('.opt');
+        if(!el) return;
+        e.preventDefault();
+        selectOption(parseInt(el.dataset.q,10), parseInt(el.dataset.o,10), el);
+      }, {passive:false});
+      document.getElementById('quiz').addEventListener('touchend', (e)=>{
+        const el = e.target.closest('.opt');
+        if(!el) return;
+        e.preventDefault();
+        selectOption(parseInt(el.dataset.q,10), parseInt(el.dataset.o,10), el);
+      }, {passive:false});
 
-      // quiz options
-      document.querySelectorAll('.quiz-option').forEach(opt => {
-        bindTap(opt, ()=>selectQuizOption(opt));
-      });
+      bindTap(document.getElementById('checkBtn'), checkQuiz);
+      bindTap(document.getElementById('bepBtn'), toggleBEP);
+      bindTap(document.getElementById('vrBtn'), toggleVR);
+      bindTap(document.getElementById('vrClose'), closeVR);
 
-      bindTap(document.getElementById('check-answers'), checkQuizAnswers);
-      bindTap(document.getElementById('bep-toggle'), toggleBEPMode);
-
-      // VR buttons (hem header hem VR overlay close)
-      bindTap(document.getElementById('vr-toggle'), toggleVRMode);
-      bindTap(document.getElementById('vr-close'), closeVR);
-
-      // VR overlay: arka kaymayı engelle
-      const stage = document.getElementById('vr-stage');
-      stage.addEventListener('touchmove', (e)=>e.preventDefault(), {passive:false});
-      stage.addEventListener('wheel', (e)=>e.preventDefault(), {passive:false});
+      // VR açıkken sayfanın kaymasını tamamen engelle
+      document.getElementById('vrStage').addEventListener('touchmove', (e)=>e.preventDefault(), {passive:false});
     }
 
-    // ========= Init =========
+    /************ 11) Init ************/
     function init(){
       renderMissions();
       renderAchievements();
       renderQuiz();
-      setupEventListeners();
       updateStats();
-      updateMissionCounter();
-      fitAppToScreen();
+      wireEvents();
+      applyAppScale();
 
-      window.addEventListener('resize', () => {
-        fitAppToScreen();
-        refreshVRStereo();
+      window.addEventListener('resize', ()=>{
+        applyAppScale();
+        if(vrState.on) rebuildVR();
       });
-      window.addEventListener('orientationchange', () => {
-        setTimeout(()=>{ fitAppToScreen(); refreshVRStereo(); }, 250);
+      window.addEventListener('orientationchange', ()=>{
+        setTimeout(()=>{
+          applyAppScale();
+          if(vrState.on) rebuildVR();
+        }, 250);
       });
-
-      showHUD('Hazır ✅', 1000);
     }
 
     init();
