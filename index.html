@@ -941,7 +941,10 @@ window.addEventListener("error", ()=>{});
       vrBtn.classList.remove("active");
       vrBtn.textContent="🥽 VR Modu";
       motionEnabled=false;
-      document.getElementById("motionBtn").textContent="🎛 Baş İzleme İzni";
+    document.querySelectorAll('[data-action="motion"]').forEach(b=>{
+  b.textContent = "🎛 Baş İzleme İzni";
+});
+
       updateRotateHint();
       log1("VR OFF ⛔️");
     }
@@ -961,7 +964,10 @@ window.addEventListener("error", ()=>{});
           if(res !== "granted") throw new Error("İzin verilmedi");
         }
         motionEnabled=true;
-        document.getElementById("motionBtn").textContent="✅ Baş İzleme Açık";
+   document.querySelectorAll('[data-action="motion"]').forEach(b=>{
+  b.textContent = "✅ Baş İzleme Açık";
+});
+
         log2("Motion enabled ✅");
       }catch(e){
         alert("Baş izleme açılamadı.\n\n1) HTTPS olmalı\n2) Safari içinde açılmış olmalı\n3) İzin 'Allow' olmalı\n\nDetay: "+(e?.message||e));
@@ -1049,18 +1055,28 @@ window.addEventListener("error", ()=>{});
       // BEP + VR
       bindTap(document.getElementById('bep-toggle'), toggleBEPMode);
       bindTap(document.getElementById('vr-toggle'), ()=>{ vrOn ? exitVR() : enterVR(); });
-      bindTap(document.getElementById('vrCloseBtn'), exitVR);
-      bindTap(document.getElementById('motionBtn'), requestMotionPermission);
+     // VR action buttons (iki gözde de var)
+document.querySelectorAll('[data-action="vrClose"]').forEach(btn=>{
+  bindTap(btn, exitVR);
+});
+document.querySelectorAll('[data-action="motion"]').forEach(btn=>{
+  bindTap(btn, requestMotionPermission);
+});
+document.querySelectorAll('[data-action="zoomIn"]').forEach(btn=>{
+  bindTap(btn, ()=>{ if(mapLeft){ mapLeft.zoomIn(); log2("VR zoom in"); } });
+});
+document.querySelectorAll('[data-action="zoomOut"]').forEach(btn=>{
+  bindTap(btn, ()=>{ if(mapLeft){ mapLeft.zoomOut(); log2("VR zoom out"); } });
+});
+document.querySelectorAll('[data-action="centerTR"]').forEach(btn=>{
+  bindTap(btn, ()=>{
+    if(mapLeft){
+      mapLeft.setView(trCenter,trZoom,{animate:true});
+      log2("VR center TR");
+    }
+  });
+});
 
-      // VR bottom
-      bindTap(document.getElementById('zoomIn'), ()=>{ if(mapLeft){ mapLeft.zoomIn(); log2("VR zoom in"); } });
-      bindTap(document.getElementById('zoomOut'), ()=>{ if(mapLeft){ mapLeft.zoomOut(); log2("VR zoom out"); } });
-      bindTap(document.getElementById('centerTR'), ()=>{
-        if(mapLeft){
-          mapLeft.setView(trCenter,trZoom,{animate:true});
-          log2("VR center TR");
-        }
-      });
     }
 
     /***********************
