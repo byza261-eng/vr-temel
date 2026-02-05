@@ -431,34 +431,59 @@
   <div id="vrOverlay" aria-hidden="true">
     <div id="rotateHint">📱 VR için telefonu <u>yatay</u> çevir</div>
 
-    <div class="vr-stage">
-      <div class="eye"><div class="map" id="mapLeft"></div></div>
-      <div class="eye"><div class="map" id="mapRight"></div></div>
+  <div class="vr-stage">
+  <!-- SOL GÖZ -->
+  <div class="eye">
+    <div class="map" id="mapLeft"></div>
 
-      <div class="reticle"></div>
+    <div class="vr-hud">
+      <button class="layer-btn topography" data-layer="topography" title="Topo hep açık">🏔️</button>
+      <button class="layer-btn roads inactive" data-layer="roads">🛣️</button>
+      <button class="layer-btn water inactive" data-layer="water">💧</button>
+      <button class="layer-btn settlement inactive" data-layer="settlement">🏘️</button>
+      <button class="layer-btn risk inactive" data-layer="risk">⚠️</button>
 
-      <div class="vr-hud" id="vrHud">
-        <button class="layer-btn topography" data-layer="topography" title="Topo hep açık">🏔️</button>
-        <button class="layer-btn roads inactive" data-layer="roads">🛣️</button>
-        <button class="layer-btn water inactive" data-layer="water">💧</button>
-        <button class="layer-btn settlement inactive" data-layer="settlement">🏘️</button>
-        <button class="layer-btn risk inactive" data-layer="risk">⚠️</button>
-
-        <button class="vr-btn warn" id="motionBtn">🎛 Baş İzleme İzni</button>
-        <button class="vr-btn danger" id="vrCloseBtn">✖ VR Kapat</button>
-      </div>
-
-      <div class="compass">
-        <div class="dir" id="compassDir">N</div>
-        <div class="deg" id="compassDeg">0°</div>
-      </div>
-
-      <div class="vr-bottom">
-        <button class="vr-btn" id="zoomOut">➖ Zoom</button>
-        <button class="vr-btn" id="zoomIn">➕ Zoom</button>
-        <button class="vr-btn good" id="centerTR">🇹🇷 Ortala</button>
-      </div>
+      <button class="vr-btn warn" data-action="motion">🎛 Baş İzleme İzni</button>
+      <button class="vr-btn danger" data-action="vrClose">✖ VR Kapat</button>
     </div>
+
+    <div class="vr-bottom">
+      <button class="vr-btn" data-action="zoomOut">➖ Zoom</button>
+      <button class="vr-btn" data-action="zoomIn">➕ Zoom</button>
+      <button class="vr-btn good" data-action="centerTR">🇹🇷 Ortala</button>
+    </div>
+  </div>
+
+  <!-- SAĞ GÖZ -->
+  <div class="eye">
+    <div class="map" id="mapRight"></div>
+
+    <div class="vr-hud">
+      <button class="layer-btn topography" data-layer="topography" title="Topo hep açık">🏔️</button>
+      <button class="layer-btn roads inactive" data-layer="roads">🛣️</button>
+      <button class="layer-btn water inactive" data-layer="water">💧</button>
+      <button class="layer-btn settlement inactive" data-layer="settlement">🏘️</button>
+      <button class="layer-btn risk inactive" data-layer="risk">⚠️</button>
+
+      <button class="vr-btn warn" data-action="motion">🎛 Baş İzleme İzni</button>
+      <button class="vr-btn danger" data-action="vrClose">✖ VR Kapat</button>
+    </div>
+
+    <div class="vr-bottom">
+      <button class="vr-btn" data-action="zoomOut">➖ Zoom</button>
+      <button class="vr-btn" data-action="zoomIn">➕ Zoom</button>
+      <button class="vr-btn good" data-action="centerTR">🇹🇷 Ortala</button>
+    </div>
+  </div>
+
+  <div class="reticle"></div>
+
+  <div class="compass">
+    <div class="dir" id="compassDir">N</div>
+    <div class="deg" id="compassDeg">0°</div>
+  </div>
+</div>
+
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
