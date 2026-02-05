@@ -193,73 +193,72 @@
       inset:0;
       width:100%;
       height:100%;
+      /* FIX-1: iOS'ta bazı tıklamaları öldürdüğü için kaldırıldı */
+      /* touch-action:none; */
+    }
+    /* FIX-1: Harita sürükleme / pinch davranışını sadece Leaflet üzerinde kilitle */
+    #vrOverlay .leaflet-container{
       touch-action:none;
     }
+
     #vrOverlay{
       position:fixed;inset:0;z-index:9999;background:#000;display:none;
     }
     #vrOverlay.on{display:block}
     .vr-stage{position:absolute;inset:0;display:flex;width:100%;height:100%}
-  .eye{
-  position:relative;
-  width:50%;
-  height:100%;
-  overflow:hidden;
-  background:#000;
+    .eye{
+      position:relative;
+      width:50%;
+      height:100%;
+      overflow:hidden;
+      background:#000;
+      border-radius: 0;
+      margin: 0;
+      outline: none;
+      box-shadow: none;
+    }
 
-  /* DÜZ split-screen: yuvarlaklık yok */
-  border-radius: 0;
-  margin: 0;
+    .eye::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index: 3002;
+      opacity:.65;
+      background:
+        radial-gradient(circle at 30% 25%,
+          rgba(255,255,255,.18) 0%,
+          rgba(255,255,255,0) 40%),
+        radial-gradient(circle at 70% 70%,
+          rgba(255,255,255,.08) 0%,
+          rgba(255,255,255,0) 45%);
+    }
 
-  outline: none;
-  box-shadow: none;
-}
+    .eye .leaflet-container{
+      transform: scale(1.10);
+      transform-origin: center;
+      filter: contrast(1.10) saturate(1.12);
+    }
 
-/* Lens parlama + cam efekti */
-.eye::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  z-index: 3002;
-  opacity:.65;
-  background:
-    radial-gradient(circle at 30% 25%,
-      rgba(255,255,255,.18) 0%,
-      rgba(255,255,255,0) 40%),
-    radial-gradient(circle at 70% 70%,
-      rgba(255,255,255,.08) 0%,
-      rgba(255,255,255,0) 45%);
-}
-
-/* Harita: merkez net, kenar hafif bozulmuş gibi */
-.eye .leaflet-container{
-  transform: scale(1.10);
-  transform-origin: center;
-  filter: contrast(1.10) saturate(1.12);
-}
-
-/* Kenarlara blur vererek barrel hissine yaklaş (gerçek distortion değil ama VR hissi artırır) */
-.eye .map{
-  position:absolute; inset:0;
-}
-.eye .map::before{
-  content:"";
-  position:absolute;
-  inset:-6%;
-  pointer-events:none;
-  z-index: 2500;
-  background:
-    radial-gradient(circle at 50% 50%,
-      rgba(0,0,0,0) 0%,
-      rgba(0,0,0,0) 55%,
-      rgba(0,0,0,.10) 72%,
-      rgba(0,0,0,.30) 88%,
-      rgba(0,0,0,.55) 100%);
-  backdrop-filter: blur(0.6px);
-  -webkit-backdrop-filter: blur(0.6px);
-}
-
+    .eye .map{
+      position:absolute; inset:0;
+    }
+    .eye .map::before{
+      content:"";
+      position:absolute;
+      inset:-6%;
+      pointer-events:none;
+      z-index: 2500;
+      background:
+        radial-gradient(circle at 50% 50%,
+          rgba(0,0,0,0) 0%,
+          rgba(0,0,0,0) 55%,
+          rgba(0,0,0,.10) 72%,
+          rgba(0,0,0,.30) 88%,
+          rgba(0,0,0,.55) 100%);
+      backdrop-filter: blur(0.6px);
+      -webkit-backdrop-filter: blur(0.6px);
+    }
 
     .eye .map{position:absolute;inset:0;width:100%;height:100%}
     #mapLeft,#mapRight{width:100%;height:100%}
@@ -335,11 +334,9 @@
     }
     #rotateHint.on{display:flex}
 
-   
     .leaflet-control-attribution{font-size:10px}
-  
-    #debug{ display:none !important; }
 
+    #debug{ display:none !important; }
   </style>
 </head>
 
@@ -431,69 +428,67 @@
   <div id="vrOverlay" aria-hidden="true">
     <div id="rotateHint">📱 VR için telefonu <u>yatay</u> çevir</div>
 
-  <div class="vr-stage">
-  <!-- SOL GÖZ -->
-  <div class="eye">
-    <div class="map" id="mapLeft"></div>
+    <div class="vr-stage">
+      <!-- SOL GÖZ -->
+      <div class="eye">
+        <div class="map" id="mapLeft"></div>
 
-    <div class="vr-hud">
-      <button class="layer-btn topography" data-layer="topography" title="Topo hep açık">🏔️</button>
-      <button class="layer-btn roads inactive" data-layer="roads">🛣️</button>
-      <button class="layer-btn water inactive" data-layer="water">💧</button>
-      <button class="layer-btn settlement inactive" data-layer="settlement">🏘️</button>
-      <button class="layer-btn risk inactive" data-layer="risk">⚠️</button>
+        <div class="vr-hud">
+          <button class="layer-btn topography" data-layer="topography" title="Topo hep açık">🏔️</button>
+          <button class="layer-btn roads inactive" data-layer="roads">🛣️</button>
+          <button class="layer-btn water inactive" data-layer="water">💧</button>
+          <button class="layer-btn settlement inactive" data-layer="settlement">🏘️</button>
+          <button class="layer-btn risk inactive" data-layer="risk">⚠️</button>
 
-      <button class="vr-btn warn" data-action="motion">🎛 Baş İzleme İzni</button>
-      <button class="vr-btn danger" data-action="vrClose">✖ VR Kapat</button>
+          <button class="vr-btn warn" data-action="motion">🎛 Baş İzleme İzni</button>
+          <button class="vr-btn danger" data-action="vrClose">✖ VR Kapat</button>
+        </div>
+
+        <div class="vr-bottom">
+          <button class="vr-btn" data-action="zoomOut">➖ Zoom</button>
+          <button class="vr-btn" data-action="zoomIn">➕ Zoom</button>
+          <button class="vr-btn good" data-action="centerTR">🇹🇷 Ortala</button>
+        </div>
+      </div>
+
+      <!-- SAĞ GÖZ -->
+      <div class="eye">
+        <div class="map" id="mapRight"></div>
+
+        <div class="vr-hud">
+          <button class="layer-btn topography" data-layer="topography" title="Topo hep açık">🏔️</button>
+          <button class="layer-btn roads inactive" data-layer="roads">🛣️</button>
+          <button class="layer-btn water inactive" data-layer="water">💧</button>
+          <button class="layer-btn settlement inactive" data-layer="settlement">🏘️</button>
+          <button class="layer-btn risk inactive" data-layer="risk">⚠️</button>
+
+          <button class="vr-btn warn" data-action="motion">🎛 Baş İzleme İzni</button>
+          <button class="vr-btn danger" data-action="vrClose">✖ VR Kapat</button>
+        </div>
+
+        <div class="vr-bottom">
+          <button class="vr-btn" data-action="zoomOut">➖ Zoom</button>
+          <button class="vr-btn" data-action="zoomIn">➕ Zoom</button>
+          <button class="vr-btn good" data-action="centerTR">🇹🇷 Ortala</button>
+        </div>
+      </div>
+
+      <div class="reticle"></div>
+
+      <div class="compass">
+        <div class="dir" id="compassDir">N</div>
+        <div class="deg" id="compassDeg">0°</div>
+      </div>
     </div>
-
-    <div class="vr-bottom">
-      <button class="vr-btn" data-action="zoomOut">➖ Zoom</button>
-      <button class="vr-btn" data-action="zoomIn">➕ Zoom</button>
-      <button class="vr-btn good" data-action="centerTR">🇹🇷 Ortala</button>
-    </div>
-  </div>
-
-  <!-- SAĞ GÖZ -->
-  <div class="eye">
-    <div class="map" id="mapRight"></div>
-
-    <div class="vr-hud">
-      <button class="layer-btn topography" data-layer="topography" title="Topo hep açık">🏔️</button>
-      <button class="layer-btn roads inactive" data-layer="roads">🛣️</button>
-      <button class="layer-btn water inactive" data-layer="water">💧</button>
-      <button class="layer-btn settlement inactive" data-layer="settlement">🏘️</button>
-      <button class="layer-btn risk inactive" data-layer="risk">⚠️</button>
-
-      <button class="vr-btn warn" data-action="motion">🎛 Baş İzleme İzni</button>
-      <button class="vr-btn danger" data-action="vrClose">✖ VR Kapat</button>
-    </div>
-
-    <div class="vr-bottom">
-      <button class="vr-btn" data-action="zoomOut">➖ Zoom</button>
-      <button class="vr-btn" data-action="zoomIn">➕ Zoom</button>
-      <button class="vr-btn good" data-action="centerTR">🇹🇷 Ortala</button>
-    </div>
-  </div>
-
-  <div class="reticle"></div>
-
-  <div class="compass">
-    <div class="dir" id="compassDir">N</div>
-    <div class="deg" id="compassDeg">0°</div>
-  </div>
-</div>
-
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    
-function log1(_) {}
-function log2(_) {}
-function logE(_) {}
-window.addEventListener("error", ()=>{});
+    function log1(_) {}
+    function log2(_) {}
+    function logE(_) {}
+    window.addEventListener("error", ()=>{});
 
     function bindTap(el, fn){
       let last = 0;
@@ -695,7 +690,6 @@ window.addEventListener("error", ()=>{});
       });
     }
 
-    // Daha belirgin (gözle görülür) örnek su/şehir/risk
     const waterLines = [
       [[41.2,28.8],[41.3,31.2],[41.15,33.4],[41.1,35.6],[41.2,37.4]],
       [[39.9,32.7],[39.4,34.7],[38.9,36.4],[37.9,38.7],[37.0,39.2]],
@@ -807,7 +801,6 @@ window.addEventListener("error", ()=>{});
       settleR=buildSettlementLayer().addTo(mapRight);
       riskR=buildRiskLayer().addTo(mapRight);
 
-      // sync views
       let lock=false;
       mapLeft.on("move",()=>{
         if(lock) return; lock=true;
@@ -911,6 +904,13 @@ window.addEventListener("error", ()=>{});
       }catch(_){}
     }
 
+    /* FIX-2: Motion butonu yazısını her yerde senkronla */
+    function setMotionButtonsText(){
+      document.querySelectorAll('[data-action="motion"]').forEach(b=>{
+        b.textContent = motionEnabled ? "✅ Baş İzleme Açık (Kapat)" : "🎛 Baş İzleme İzni";
+      });
+    }
+
     function enterVR(){
       vrOn=true;
       document.getElementById("vrOverlay").classList.add("on");
@@ -930,6 +930,8 @@ window.addEventListener("error", ()=>{});
 
       refreshAllMaps();
       setTimeout(()=>{ mapLeft.invalidateSize(); mapRight.invalidateSize(); },120);
+
+      setMotionButtonsText(); /* FIX-2 */
       log1("VR ON ✅");
     }
 
@@ -940,19 +942,16 @@ window.addEventListener("error", ()=>{});
       const vrBtn=document.getElementById("vr-toggle");
       vrBtn.classList.remove("active");
       vrBtn.textContent="🥽 VR Modu";
+
       motionEnabled=false;
-    document.querySelectorAll('[data-action="motion"]').forEach(b=>{
-  b.textContent = "🎛 Baş İzleme İzni";
-});
+      setMotionButtonsText(); /* FIX-2 */
 
       updateRotateHint();
       log1("VR OFF ⛔️");
     }
 
     async function requestMotionPermission(){
-      // IMPORTANT: iOS uses permission gating
       try{
-        // HTTPS check:
         if(location.protocol !== "https:" && location.hostname !== "localhost"){
           alert("Baş izleme için sayfa HTTPS olmalı.\nGitHub Pages zaten HTTPS olmalı.\nLinkin https:// ile başladığından emin ol.");
           log2("Motion blocked: not https");
@@ -964,15 +963,24 @@ window.addEventListener("error", ()=>{});
           if(res !== "granted") throw new Error("İzin verilmedi");
         }
         motionEnabled=true;
-   document.querySelectorAll('[data-action="motion"]').forEach(b=>{
-  b.textContent = "✅ Baş İzleme Açık";
-});
-
+        setMotionButtonsText(); /* FIX-2 */
         log2("Motion enabled ✅");
       }catch(e){
         alert("Baş izleme açılamadı.\n\n1) HTTPS olmalı\n2) Safari içinde açılmış olmalı\n3) İzin 'Allow' olmalı\n\nDetay: "+(e?.message||e));
         log2("Motion failed: "+(e?.message||e));
       }
+    }
+
+    /* FIX-2: motion toggle */
+    async function toggleMotion(){
+      if(motionEnabled){
+        motionEnabled = false;
+        setMotionButtonsText();
+        log2("Motion disabled ⛔️");
+        return;
+      }
+      await requestMotionPermission();
+      setMotionButtonsText();
     }
 
     function headingToDir(deg){
@@ -995,7 +1003,6 @@ window.addEventListener("error", ()=>{});
       document.getElementById("compassDeg").textContent = Math.round(heading)+"°";
       document.getElementById("compassDir").textContent = headingToDir(heading);
 
-      // VR-like pan
       const yaw=((heading+540)%360)-180;
       const pitch=Math.max(-35, Math.min(35, beta));
       const z=mapLeft.getZoom();
@@ -1055,28 +1062,31 @@ window.addEventListener("error", ()=>{});
       // BEP + VR
       bindTap(document.getElementById('bep-toggle'), toggleBEPMode);
       bindTap(document.getElementById('vr-toggle'), ()=>{ vrOn ? exitVR() : enterVR(); });
-     // VR action buttons (iki gözde de var)
-document.querySelectorAll('[data-action="vrClose"]').forEach(btn=>{
-  bindTap(btn, exitVR);
-});
-document.querySelectorAll('[data-action="motion"]').forEach(btn=>{
-  bindTap(btn, requestMotionPermission);
-});
-document.querySelectorAll('[data-action="zoomIn"]').forEach(btn=>{
-  bindTap(btn, ()=>{ if(mapLeft){ mapLeft.zoomIn(); log2("VR zoom in"); } });
-});
-document.querySelectorAll('[data-action="zoomOut"]').forEach(btn=>{
-  bindTap(btn, ()=>{ if(mapLeft){ mapLeft.zoomOut(); log2("VR zoom out"); } });
-});
-document.querySelectorAll('[data-action="centerTR"]').forEach(btn=>{
-  bindTap(btn, ()=>{
-    if(mapLeft){
-      mapLeft.setView(trCenter,trZoom,{animate:true});
-      log2("VR center TR");
-    }
-  });
-});
 
+      // VR action buttons (iki gözde de var)
+      document.querySelectorAll('[data-action="vrClose"]').forEach(btn=>{
+        bindTap(btn, exitVR);
+      });
+
+      /* FIX-3: motion için native click (iOS gesture daha sağlam) */
+      document.querySelectorAll('[data-action="motion"]').forEach(btn=>{
+        btn.addEventListener("click", toggleMotion, {passive:true});
+      });
+
+      document.querySelectorAll('[data-action="zoomIn"]').forEach(btn=>{
+        bindTap(btn, ()=>{ if(mapLeft){ mapLeft.zoomIn(); log2("VR zoom in"); } });
+      });
+      document.querySelectorAll('[data-action="zoomOut"]').forEach(btn=>{
+        bindTap(btn, ()=>{ if(mapLeft){ mapLeft.zoomOut(); log2("VR zoom out"); } });
+      });
+      document.querySelectorAll('[data-action="centerTR"]').forEach(btn=>{
+        bindTap(btn, ()=>{
+          if(mapLeft){
+            mapLeft.setView(trCenter,trZoom,{animate:true});
+            log2("VR center TR");
+          }
+        });
+      });
     }
 
     /***********************
@@ -1094,6 +1104,7 @@ document.querySelectorAll('[data-action="centerTR"]').forEach(btn=>{
       updateTaskPrompt("Hazır ✅","Şimdi 'Su'ya bas: mavi nehir/göl görünmeli. Tekrar bas: kapanmalı.");
       checkMissions();
 
+      setMotionButtonsText(); /* ilk yüklemede de doğru yazsın */
       log2("iOS click binder aktif ✅");
     }
 
